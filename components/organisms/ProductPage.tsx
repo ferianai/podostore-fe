@@ -8,6 +8,18 @@ import ProductSkeleton from "@/components/molecules/product/ProductSkeleton";
 import { useProductData } from "@/hooks/useProductData";
 import { useProductFilters } from "@/hooks/useProductFilters";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import { usePagination } from "@/hooks/usePagination";
+
+interface ProductForm {
+  nama_produk: string;
+  harga_jual_ecer: string;
+  harga_jual_grosir: string;
+  harga_beli_sm: string;
+  harga_beli_sales: string;
+  category: string;
+  qty: string;
+  status: string;
+}
 
 interface Product {
   id: number;
@@ -36,32 +48,58 @@ export default function ProductPage() {
     setSortBy,
     sortDir,
     setSortDir,
-    page,
-    setPage,
     categories,
-    paginatedProducts,
-    totalPages,
+    sortedProducts,
     handleExport,
   } = useProductFilters(products);
 
-  const handleAddProduct = async (product: Omit<Product, 'id'>) => {
+  const {
+    page,
+    setPage,
+    rowsPerPage,
+    setRowsPerPage,
+    totalPages,
+    paginatedData,
+  } = usePagination(sortedProducts, 10);
+
+  const handleAddProduct = async (productForm: ProductForm) => {
+    const product = {
+      namaProduk: productForm.nama_produk,
+      hargaJualEcer: Number(productForm.harga_jual_ecer),
+      hargaJualGrosir: Number(productForm.harga_jual_grosir),
+      hargaBeliSm: Number(productForm.harga_beli_sm),
+      hargaBeliSales: Number(productForm.harga_beli_sales),
+      category: productForm.category,
+      qty: Number(productForm.qty),
+      status: productForm.status,
+    };
     try {
       await addProduct(product);
       setModalOpen(false);
       setEditingProduct(null);
-      loadData();
+      await loadData(); // Ensure loadData is awaited
     } catch (error) {
       console.error("Failed to add product:", error);
     }
   };
 
-  const handleEditProduct = async (product: Omit<Product, 'id'>) => {
+  const handleEditProduct = async (productForm: ProductForm) => {
     if (!editingProduct) return;
+    const product = {
+      namaProduk: productForm.nama_produk,
+      hargaJualEcer: Number(productForm.harga_jual_ecer),
+      hargaJualGrosir: Number(productForm.harga_jual_grosir),
+      hargaBeliSm: Number(productForm.harga_beli_sm),
+      hargaBeliSales: Number(productForm.harga_beli_sales),
+      category: productForm.category,
+      qty: Number(productForm.qty),
+      status: productForm.status,
+    };
     try {
       await updateProduct(editingProduct.id, product);
       setModalOpen(false);
       setEditingProduct(null);
-      loadData();
+      await loadData(); // Ensure loadData is awaited
     } catch (error) {
       console.error("Failed to edit product:", error);
     }
@@ -71,7 +109,7 @@ export default function ProductPage() {
     if (confirm("Yakin ingin menghapus produk ini?")) {
       try {
         await deleteProduct(id);
-        loadData();
+        await loadData(); // Ensure loadData is awaited
       } catch (error) {
         console.error("Failed to delete product:", error);
       }
@@ -112,7 +150,7 @@ export default function ProductPage() {
         <ProductSkeleton />
       ) : (
         <ProductTable
-          products={paginatedProducts}
+          products={paginatedData}
           onEdit={(p) => {
             setEditingProduct(p);
             setModalOpen(true);
@@ -122,33 +160,63 @@ export default function ProductPage() {
       )}
 
       {/* pagination control */}
-      {!loading && totalPages > 1 && (
-        <div className="flex justify-end mt-4 gap-2">
+      <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground border-t pt-3">
+        {/* Left info */}
+        <div>
+          {`${(page - 1) * rowsPerPage + 1} - ${Math.min(page * rowsPerPage, sortedProducts.length)} of ${sortedProducts.length} items`}
+        </div>
+
+        {/* Right controls */}
+        <div className="flex items-center gap-2">
+          {/* Rows per page selector */}
+          <div className="flex items-center gap-1">
+            <span>Rows per page:</span>
+            <select
+              value={rowsPerPage}
+              onChange={(e) => setRowsPerPage(Number(e.target.value))}
+              className="border rounded-md px-2 py-1 bg-background"
+            >
+              {[10, 20, 50, 100].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
+
+          <span>The page on</span>
+          <select
+            value={page}
+            onChange={(e) => setPage(Number(e.target.value))}
+            className="border rounded-md px-2 py-1 bg-background"
+          >
+            {Array.from({ length: totalPages }, (_, i) => (
+              <option key={i + 1} value={i + 1}>
+                {i + 1}
+              </option>
+            ))}
+          </select>
+
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-3 py-1 border rounded-md hover:bg-muted disabled:opacity-50"
+            className="border rounded-md px-2 py-1 hover:bg-muted disabled:opacity-50"
           >
-            Prev
+            ‹
           </button>
-          <span className="px-2 text-sm text-muted-foreground">
-            Page {page} of {totalPages}
-          </span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-3 py-1 border rounded-md hover:bg-muted disabled:opacity-50"
+            className="border rounded-md px-2 py-1 hover:bg-muted disabled:opacity-50"
           >
-            Next
+            ›
           </button>
         </div>
-      )}
+      </div>
 
       {modalOpen && (
         <ProductFormModal
           onClose={() => setModalOpen(false)}
           onSubmit={editingProduct ? handleEditProduct : handleAddProduct}
-          initialData={editingProduct}
+          initialData={editingProduct || undefined}
         />
       )}
     </div>

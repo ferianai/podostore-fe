@@ -17,13 +17,13 @@ export async function addProduct(product: any) {
   console.log("addProduct called with product:", product);
   const payload = {
     product: {
-      namaProduk: product.nama_produk,
-      hargaJualEcer: Number(product.harga_jual_ecer),
-      hargaJualGrosir: Number(product.harga_jual_grosir),
-      hargaBeliSm: Number(product.harga_beli_sm),
-      hargaBeliSales: Number(product.harga_beli_sales),
+      namaProduk: product.namaProduk,
+      hargaJualEcer: product.hargaJualEcer,
+      hargaJualGrosir: product.hargaJualGrosir,
+      hargaBeliSm: product.hargaBeliSm,
+      hargaBeliSales: product.hargaBeliSales,
       category: product.category,
-      qty: Number(product.qty),
+      qty: product.qty,
       status: product.status,
     },
   };
@@ -52,13 +52,13 @@ export async function updateProduct(id: number, product: any) {
     headers,
     body: JSON.stringify({
       product: {
-        namaProduk: product.nama_produk,
-        hargaJualEcer: Number(product.harga_jual_ecer),
-        hargaJualGrosir: Number(product.harga_jual_grosir),
-        hargaBeliSm: Number(product.harga_beli_sm),
-        hargaBeliSales: Number(product.harga_beli_sales),
+        namaProduk: product.namaProduk,
+        hargaJualEcer: product.hargaJualEcer,
+        hargaJualGrosir: product.hargaJualGrosir,
+        hargaBeliSm: product.hargaBeliSm,
+        hargaBeliSales: product.hargaBeliSales,
         category: product.category,
-        qty: Number(product.qty),
+        qty: product.qty,
         status: product.status,
       },
     }),

@@ -18,8 +18,7 @@ export function useProductFilters(products: Product[]) {
   const [category, setCategory] = useState('');
   const [sortBy, setSortBy] = useState<string>('');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-  const [page, setPage] = useState(1);
-  const perPage = 10;
+  // Removed pagination logic; handle externally
 
   const categories = useMemo(() => {
     const all = products.map((p) => p.category).filter(Boolean);
@@ -55,12 +54,7 @@ export function useProductFilters(products: Product[]) {
     return arr;
   }, [filteredProducts, sortBy, sortDir]);
 
-  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / perPage));
-  const paginatedProducts = sortedProducts.slice((page - 1) * perPage, page * perPage);
-
-  useEffect(() => {
-    setPage(1);
-  }, [searchTerm, category, sortBy, sortDir]);
+  // Pagination removed; handle externally
 
   const handleExport = () => {
     const toExport = sortedProducts.map((p) => ({
@@ -85,14 +79,9 @@ export function useProductFilters(products: Product[]) {
     setSortBy,
     sortDir,
     setSortDir,
-    page,
-    setPage,
-    perPage,
     categories,
     filteredProducts,
     sortedProducts,
-    paginatedProducts,
-    totalPages,
     handleExport,
   };
 }
