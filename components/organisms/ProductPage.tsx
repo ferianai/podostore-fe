@@ -14,27 +14,29 @@ interface ProductForm {
   nama_produk: string;
   harga_beli_sm: string;
   harga_beli_sales: string;
-  harga_jual_ecer: string;
-  harga_jual_grosir: string;
   kategori: string;
   isi: string;
+  persen_laba_ecer: string;
+  persen_laba_dus: string;
 }
 
 interface Product {
-  id: number;
+  id: string;
   namaProduk: string;
   hargaBeliSm: number;
   hargaBeliSales: number;
   hargaJualEcer: number;
-  hargaJualGrosir: number;
+  hargaJualDus: number;
   kategori: string;
   isi: number;
+  persenLabaEcer: string;
+  persenLabaDus: string;
 }
 
 export default function ProductPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const { products, loading, addProduct, updateProduct, deleteProduct, loadData } = useProductData();
+  const { products, loading, error, addProduct, updateProduct, deleteProduct, loadData } = useProductData();
   const { darkMode, setDarkMode } = useDarkMode();
 
   const {
@@ -61,14 +63,33 @@ export default function ProductPage() {
   } = usePagination(sortedProducts, 10);
 
   const handleAddProduct = async (productForm: ProductForm) => {
+    const hargaBeliSm = Number(productForm.harga_beli_sm);
+    const isi = Number(productForm.isi);
+    const persenLabaEcer = Number(productForm.persen_laba_ecer) / 100;
+    const persenLabaDus = Number(productForm.persen_laba_dus) / 100;
+
+    const calculatedHargaJualDus = hargaBeliSm + (hargaBeliSm * persenLabaDus);
+    const calculatedHargaJualEcer = (hargaBeliSm / isi) + ((hargaBeliSm * persenLabaEcer) / isi);
+
+    // Rounding function
+    const roundUpTo = (value: number, to: number) => Math.ceil(value / to) * to;
+
+    // Round harga_jual_dus: if < 100000, round up to next 500, else to next 1000
+    const hargaJualDus = calculatedHargaJualDus < 100000 ? roundUpTo(calculatedHargaJualDus, 500) : roundUpTo(calculatedHargaJualDus, 1000);
+
+    // Round harga_jual_ecer: always round up to next 1000
+    const hargaJualEcer = roundUpTo(calculatedHargaJualEcer, 1000);
+
     const product = {
       namaProduk: productForm.nama_produk,
-      hargaBeliSm: Number(productForm.harga_beli_sm),
+      hargaBeliSm: hargaBeliSm,
       hargaBeliSales: Number(productForm.harga_beli_sales),
-      hargaJualEcer: Number(productForm.harga_jual_ecer),
-      hargaJualGrosir: Number(productForm.harga_jual_grosir),
+      hargaJualEcer: hargaJualEcer,
+      hargaJualDus: hargaJualDus,
       kategori: productForm.kategori,
-      isi: Number(productForm.isi),
+      isi: isi,
+      persenLabaEcer: productForm.persen_laba_ecer,
+      persenLabaDus: productForm.persen_laba_dus,
     };
     try {
       await addProduct(product);
@@ -82,14 +103,33 @@ export default function ProductPage() {
 
   const handleEditProduct = async (productForm: ProductForm) => {
     if (!editingProduct) return;
+    const hargaBeliSm = Number(productForm.harga_beli_sm);
+    const isi = Number(productForm.isi);
+    const persenLabaEcer = Number(productForm.persen_laba_ecer) / 100;
+    const persenLabaDus = Number(productForm.persen_laba_dus) / 100;
+
+    const calculatedHargaJualDus = hargaBeliSm + (hargaBeliSm * persenLabaDus);
+    const calculatedHargaJualEcer = (hargaBeliSm / isi) + ((hargaBeliSm * persenLabaEcer) / isi);
+
+    // Rounding function
+    const roundUpTo = (value: number, to: number) => Math.ceil(value / to) * to;
+
+    // Round harga_jual_dus: if < 100000, round up to next 500, else to next 1000
+    const hargaJualDus = calculatedHargaJualDus < 100000 ? roundUpTo(calculatedHargaJualDus, 500) : roundUpTo(calculatedHargaJualDus, 1000);
+
+    // Round harga_jual_ecer: always round up to next 1000
+    const hargaJualEcer = roundUpTo(calculatedHargaJualEcer, 1000);
+
     const product = {
       namaProduk: productForm.nama_produk,
-      hargaBeliSm: Number(productForm.harga_beli_sm),
+      hargaBeliSm: hargaBeliSm,
       hargaBeliSales: Number(productForm.harga_beli_sales),
-      hargaJualEcer: Number(productForm.harga_jual_ecer),
-      hargaJualGrosir: Number(productForm.harga_jual_grosir),
+      hargaJualEcer: hargaJualEcer,
+      hargaJualDus: hargaJualDus,
       kategori: productForm.kategori,
-      isi: Number(productForm.isi),
+      isi: isi,
+      persenLabaEcer: productForm.persen_laba_ecer,
+      persenLabaDus: productForm.persen_laba_dus,
     };
     try {
       await updateProduct(editingProduct.id, product);
@@ -101,7 +141,7 @@ export default function ProductPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (confirm("Yakin ingin menghapus produk ini?")) {
       try {
         await deleteProduct(id);
@@ -142,7 +182,17 @@ export default function ProductPage() {
         setDarkMode={setDarkMode}
       />
 
-      {loading ? (
+      {error ? (
+        <div className="text-center py-8 text-red-600">
+          <p>Error loading products: {error}</p>
+          <button
+            onClick={loadData}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      ) : loading ? (
         <ProductSkeleton />
       ) : (
         <ProductTable

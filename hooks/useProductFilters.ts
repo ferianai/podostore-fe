@@ -1,15 +1,17 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { exportToCsv } from '@/lib/utils';
 
 interface Product {
-  id: number;
+  id: string;
   namaProduk: string;
-  hargaJualEcer: number;
-  hargaJualGrosir: number;
   hargaBeliSm: number;
   hargaBeliSales: number;
+  hargaJualEcer: number;
+  hargaJualDus: number;
   kategori: string;
   isi: number;
+  persenLabaEcer: string;
+  persenLabaDus: string;
 }
 
 export function useProductFilters(products: Product[]) {
@@ -21,7 +23,7 @@ export function useProductFilters(products: Product[]) {
 
   const categories = useMemo(() => {
     const all = products.map((p) => p.kategori).filter(Boolean);
-    return Array.from(new Set(all));
+    return ['All Categories', ...Array.from(new Set(all)).sort((a, b) => a.localeCompare(b))];
   }, [products]);
 
   const filteredProducts = useMemo(() => {
@@ -59,11 +61,13 @@ export function useProductFilters(products: Product[]) {
     const toExport = sortedProducts.map((p) => ({
       NamaProduk: p.namaProduk,
       HargaJualEcer: p.hargaJualEcer,
-      HargaJualGrosir: p.hargaJualGrosir,
+      HargaJualDus: p.hargaJualDus,
       HargaBeliSM: p.hargaBeliSm,
       HargaBeliSales: p.hargaBeliSales,
       Kategori: p.kategori,
       Isi: p.isi,
+      PersenLabaEcer: p.persenLabaEcer,
+      PersenLabaDus: p.persenLabaDus,
     }));
     exportToCsv(`product-export-${new Date().toISOString().slice(0, 10)}.csv`, toExport);
   };

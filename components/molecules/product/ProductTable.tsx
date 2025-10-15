@@ -2,10 +2,23 @@
 
 import ProductRow from "./ProductRow";
 
+interface Product {
+  id: string;
+  namaProduk: string;
+  hargaBeliSm: number;
+  hargaBeliSales: number;
+  hargaJualEcer: number;
+  hargaJualDus: number;
+  kategori: string;
+  isi: number;
+  persenLabaEcer: string;
+  persenLabaDus: string;
+}
+
 interface ProductTableProps {
-  products: any[];
-  onEdit: (p: any) => void;
-  onDelete: (id: number) => void;
+  products: Product[];
+  onEdit: (p: Product) => void;
+  onDelete: (id: string) => void;
 }
 
 export default function ProductTable({
@@ -21,10 +34,12 @@ export default function ProductTable({
             <th className="px-4 py-3 ">Nama Produk</th>
             <th className="px-4 py-3">Harga Beli SM</th>
             <th className="px-4 py-3">Harga Beli Sales</th>
-            <th className="px-4 py-3">Harga Ecer</th>
-            <th className="px-4 py-3">Harga Grosir</th>
+            <th className="px-4 py-3">Harga Jual Ecer</th>
+            <th className="px-4 py-3">Harga Jual Dus</th>
             <th className="px-4 py-3">Kategori</th>
             <th className="px-4 py-3 text-center">Isi</th>
+            <th className="px-4 py-3 text-center">Persen Laba Ecer</th>
+            <th className="px-4 py-3 text-center">Persen Laba Dus</th>
             <th className="px-4 py-3 text-right">Action</th>
           </tr>
         </thead>

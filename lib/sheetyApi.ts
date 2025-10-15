@@ -21,9 +21,11 @@ export async function addProduct(product: any) {
       hargaBeliSm: product.hargaBeliSm,
       hargaBeliSales: product.hargaBeliSales,
       hargaJualEcer: product.hargaJualEcer,
-      hargaJualGrosir: product.hargaJualGrosir,
+      hargaJualDus: product.hargaJualDus,
       kategori: product.kategori,
       isi: product.isi,
+      persenLabaEcer: product.persenLabaEcer,
+      persenLabaDus: product.persenLabaDus,
     },
   };
   console.log("addProduct payload:", JSON.stringify(payload, null, 2));
@@ -46,23 +48,36 @@ export async function addProduct(product: any) {
 
 // 🔹 PUT
 export async function updateProduct(id: number, product: any) {
+  console.log("updateProduct called with id:", id, "product:", product);
+  const payload = {
+    product: {
+      namaProduk: product.namaProduk,
+      hargaBeliSm: product.hargaBeliSm,
+      hargaBeliSales: product.hargaBeliSales,
+      hargaJualEcer: product.hargaJualEcer,
+      hargaJualDus: product.hargaJualDus,
+      kategori: product.kategori,
+      isi: product.isi,
+      persenLabaEcer: product.persenLabaEcer,
+      persenLabaDus: product.persenLabaDus,
+    },
+  };
+  console.log("updateProduct payload:", JSON.stringify(payload, null, 2));
   const res = await fetch(`${BASE_URL}/products/${id}`, {
     method: "PUT",
     headers,
-    body: JSON.stringify({
-      product: {
-        namaProduk: product.namaProduk,
-        hargaBeliSm: product.hargaBeliSm,
-        hargaBeliSales: product.hargaBeliSales,
-        hargaJualEcer: product.hargaJualEcer,
-        hargaJualGrosir: product.hargaJualGrosir,
-        kategori: product.kategori,
-        isi: product.isi,
-      },
-    }),
+    body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error("Failed to update product");
-  return await res.json();
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Error response:", text);
+    throw new Error("Failed to update product");
+  }
+
+  const result = await res.json();
+  console.log("updateProduct result:", result);
+  return result;
 }
 
 // 🔹 DELETE

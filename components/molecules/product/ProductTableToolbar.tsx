@@ -45,12 +45,11 @@ export default function ProductTableToolbar({
 
         <select
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          onChange={(e) => setCategory(e.target.value === 'All Categories' ? '' : e.target.value)}
           className="border border-border rounded-lg px-3 py-2 bg-background"
         >
-          <option value="">Semua Kategori</option>
           {categories.map((cat) => (
-            <option key={cat} value={cat}>
+            <option key={cat} value={cat === 'All Categories' ? '' : cat}>
               {cat}
             </option>
           ))}
@@ -65,9 +64,12 @@ export default function ProductTableToolbar({
         >
           <option value="">Sort by</option>
           <option value="namaProduk">Nama</option>
-          <option value="k">kategori</option>
+          <option value="kategori">Kategori</option>
           <option value="hargaJualEcer">Harga Ecer</option>
+          <option value="hargaJualDus">Harga Dus</option>
           <option value="isi">Isi</option>
+          <option value="persenLabaEcer">Persen Laba Ecer</option>
+          <option value="persenLabaDus">Persen Laba Dus</option>
         </select>
 
         <button

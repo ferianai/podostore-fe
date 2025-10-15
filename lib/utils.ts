@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // lib/utils.ts
-export function formatCurrency(value: any) {
+export function formatCurrency(value: number | string | null | undefined) {
   if (value == null || value === "") return "-";
   const n = Number(value);
   if (Number.isNaN(n)) return String(value);
@@ -14,7 +14,7 @@ export function formatCurrency(value: any) {
 }
 
 /** export array of objects to CSV and download */
-export function exportToCsv(filename: string, rows: any[]) {
+export function exportToCsv(filename: string, rows: Record<string, unknown>[]) {
   if (!rows || !rows.length) {
     const blob = new Blob([""], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");

@@ -1,29 +1,116 @@
 "use client";
 
-import { Edit, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Edit, Trash2, Loader2 } from "lucide-react";
+import { updateProduct } from "@/lib/airtableApi"; // pastikan path sesuai
 
-export default function ProductRow({ product, onEdit, onDelete }: any) {
+interface Product {
+  id: string;
+  namaProduk: string;
+  hargaBeliSm: number;
+  hargaBeliSales: number;
+  hargaJualEcer: number;
+  hargaJualDus: number;
+  kategori: string;
+  isi: number;
+  persenLabaEcer: string;
+  persenLabaDus: string;
+}
+
+interface ProductRowProps {
+  product: Product;
+  onEdit: (p: Product) => void;
+  onDelete: (id: string) => void;
+}
+
+export default function ProductRow({ product, onEdit, onDelete }: ProductRowProps) {
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [tempValue, setTempValue] = useState<string | number>("");
+  const [saving, setSaving] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(product);
+
+  const handleEdit = (field: keyof Product, value: string | number) => {
+    setEditingField(field);
+    setTempValue(value);
+  };
+
+  const handleSave = async (field: keyof Product) => {
+    setSaving(true);
+    const updated = { ...currentProduct, [field]: tempValue };
+    try {
+      await updateProduct(updated.id, { [field]: tempValue });
+      setCurrentProduct(updated);
+    } catch (err) {
+      console.error("Update failed:", err);
+    } finally {
+      setSaving(false);
+      setEditingField(null);
+    }
+  };
+
+  const renderCell = (field: keyof Product, isCurrency = false, align = "left") => {
+    const value = currentProduct[field];
+
+    // Jika sedang mengedit field ini
+    if (editingField === field) {
+      return (
+        <td className={`px-4 py-3 text-${align}`}>
+          <input
+            type={typeof value === "number" ? "number" : "text"}
+            className="border rounded-md px-2 py-1 w-full text-sm"
+            value={tempValue}
+            autoFocus
+            onChange={(e) =>
+              setTempValue(
+                typeof value === "number" ? Number(e.target.value) : e.target.value
+              )
+            }
+            onBlur={() => handleSave(field)}
+            onKeyDown={(e) => e.key === "Enter" && handleSave(field)}
+          />
+        </td>
+      );
+    }
+
+    // Jika tidak sedang mengedit
+    return (
+      <td
+        className={`px-4 py-3 text-${align} cursor-pointer hover:bg-muted/40`}
+        onClick={() => handleEdit(field, value)}
+      >
+        {isCurrency ? `Rp ${Number(value).toLocaleString()}` : value}
+      </td>
+    );
+  };
 
   return (
     <tr className="border-b hover:bg-muted/50 transition">
-      <td className="px-4 py-3 font-medium">{product.namaProduk}</td>
-      <td className="px-4 py-3">Rp {product.hargaBeliSm?.toLocaleString()}</td>
-      <td className="px-4 py-3">Rp {product.hargaBeliSales?.toLocaleString()}</td>
-      <td className="px-4 py-3">Rp {product.hargaJualEcer?.toLocaleString()}</td>
-      <td className="px-4 py-3">Rp {product.hargaJualGrosir?.toLocaleString()}</td>
-      <td className="px-4 py-3">{product.kategori}</td>
-      <td className="px-4 py-3 text-center">{product.isi}</td>
+      {renderCell("namaProduk")}
+      {renderCell("hargaBeliSm", true)}
+      {renderCell("hargaBeliSales", true)}
+      {renderCell("hargaJualEcer", true)}
+      {renderCell("hargaJualDus", true)}
+      {renderCell("kategori")}
+      {renderCell("isi", false, "center")}
+      {renderCell("persenLabaEcer", false, "center")}
+      {renderCell("persenLabaDus", false, "center")}
       <td className="px-4 py-3 flex items-center gap-2 justify-end text-muted-foreground">
-        <Edit
-          size={16}
-          className="cursor-pointer hover:text-blue-600"
-          onClick={() => onEdit(product)}
-        />
-        <Trash2
-          size={16}
-          className="cursor-pointer hover:text-red-600"
-          onClick={() => onDelete(product.id)}
-        />
+        {saving ? (
+          <Loader2 size={16} className="animate-spin text-blue-500" />
+        ) : (
+          <>
+            <Edit
+              size={16}
+              className="cursor-pointer hover:text-blue-600"
+              onClick={() => onEdit(currentProduct)}
+            />
+            <Trash2
+              size={16}
+              className="cursor-pointer hover:text-red-600"
+              onClick={() => onDelete(currentProduct.id)}
+            />
+          </>
+        )}
       </td>
     </tr>
   );
