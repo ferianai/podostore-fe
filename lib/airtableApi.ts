@@ -115,8 +115,8 @@ export async function updateProduct(
     hargaJualDus: number;
     kategori: string;
     isi: number;
-    persenLabaEcer: string;
-    persenLabaDus: string;
+    persenLabaEcer: number;
+    persenLabaDus: number;
   }
 ) {
   const payload = {

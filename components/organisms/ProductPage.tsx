@@ -29,8 +29,8 @@ interface Product {
   hargaJualDus: number;
   kategori: string;
   isi: number;
-  persenLabaEcer: string;
-  persenLabaDus: string;
+  persenLabaEcer: number;
+  persenLabaDus: number;
 }
 
 export default function ProductPage() {
@@ -88,8 +88,8 @@ export default function ProductPage() {
       hargaJualDus: hargaJualDus,
       kategori: productForm.kategori,
       isi: isi,
-      persenLabaEcer: productForm.persen_laba_ecer,
-      persenLabaDus: productForm.persen_laba_dus,
+      persenLabaEcer: Number(productForm.persen_laba_ecer),
+      persenLabaDus: Number(productForm.persen_laba_dus),
     };
     try {
       await addProduct(product);
@@ -128,8 +128,8 @@ export default function ProductPage() {
       hargaJualDus: hargaJualDus,
       kategori: productForm.kategori,
       isi: isi,
-      persenLabaEcer: productForm.persen_laba_ecer,
-      persenLabaDus: productForm.persen_laba_dus,
+      persenLabaEcer: Number(productForm.persen_laba_ecer),
+      persenLabaDus: Number(productForm.persen_laba_dus),
     };
     try {
       await updateProduct(editingProduct.id, product);

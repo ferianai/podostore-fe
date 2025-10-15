@@ -10,8 +10,8 @@ interface Product {
   hargaJualDus: number;
   kategori: string;
   isi: number;
-  persenLabaEcer: string;
-  persenLabaDus: string;
+  persenLabaEcer: number;
+  persenLabaDus: number;
 }
 
 export function useProductData() {
