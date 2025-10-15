@@ -32,7 +32,7 @@ export async function getProductList(options: {
     });
   }
 
-  const url = `${BASE_URL}?${params.toString()}`;
+  const url = params.toString() ? `${BASE_URL}?${params.toString()}` : BASE_URL;
   const res = await fetch(url, { headers, cache: "no-store" });
 
   if (!res.ok) throw new Error("Failed to fetch products");
@@ -67,8 +67,8 @@ export async function addProduct(product: {
   hargaJualDus: number;
   kategori: string;
   isi: number;
-  persenLabaEcer: string;
-  persenLabaDus: string;
+  persenLabaEcer: number;
+  persenLabaDus: number;
 }) {
   const payload = {
     records: [
