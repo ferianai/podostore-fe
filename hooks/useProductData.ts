@@ -1,7 +1,7 @@
+// hooks/useProductData.ts
 import { useState, useEffect, useCallback } from 'react';
-import { getProductList, addProduct, updateProduct, deleteProduct } from '@/lib/airtableApi';
 
-interface Product {
+export interface Product {
   id: string;
   namaProduk: string;
   hargaBeliSm: number;
@@ -14,6 +14,15 @@ interface Product {
   persenLabaDus: number;
 }
 
+interface AirtableRecord {
+  id: string;
+  fields: Omit<Product, 'id'>;
+}
+
+interface AirtableResponse {
+  records: AirtableRecord[];
+}
+
 export function useProductData() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,8 +32,15 @@ export function useProductData() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getProductList();
-      setProducts(data.records);
+      const res = await fetch('/api/products');
+      if (!res.ok) throw new Error('Failed to fetch products');
+
+      const data: AirtableResponse = await res.json();
+      const mapped = data.records.map((record) => ({
+        id: record.id,
+        ...record.fields,
+      }));
+      setProducts(mapped);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load products');
     } finally {
@@ -49,10 +65,17 @@ export function useProductData() {
 
   const handleAddProduct = useCallback(async (product: Omit<Product, 'id'>) => {
     try {
-      const sanitizedProduct = sanitizeProductInput(product);
-      const newProduct = await addProduct(sanitizedProduct);
-      setProducts(prev => [...prev, newProduct.fields]);
-      return newProduct;
+      const sanitized = sanitizeProductInput(product);
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sanitized),
+      });
+      if (!res.ok) throw new Error('Failed to add product');
+
+      const newRecord: AirtableRecord = await res.json();
+      setProducts((prev) => [...prev, { id: newRecord.id, ...newRecord.fields }]);
+      return newRecord;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add product');
       throw err;
@@ -61,10 +84,19 @@ export function useProductData() {
 
   const handleUpdateProduct = useCallback(async (id: string, product: Omit<Product, 'id'>) => {
     try {
-      const sanitizedProduct = sanitizeProductInput(product);
-      const updatedProduct = await updateProduct(id, sanitizedProduct);
-      setProducts(prev => prev.map(p => p.id === id ? updatedProduct.fields : p));
-      return updatedProduct;
+      const sanitized = sanitizeProductInput(product);
+      const res = await fetch('/api/products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, ...sanitized }),
+      });
+      if (!res.ok) throw new Error('Failed to update product');
+
+      const updatedRecord: AirtableRecord = await res.json();
+      setProducts((prev) =>
+        prev.map((p) => (p.id === id ? { id: updatedRecord.id, ...updatedRecord.fields } : p))
+      );
+      return updatedRecord;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update product');
       throw err;
@@ -73,8 +105,9 @@ export function useProductData() {
 
   const handleDeleteProduct = useCallback(async (id: string) => {
     try {
-      await deleteProduct(id);
-      setProducts(prev => prev.filter(p => p.id !== id));
+      const res = await fetch(`/api/products?id=${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete product');
+      setProducts((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete product');
       throw err;

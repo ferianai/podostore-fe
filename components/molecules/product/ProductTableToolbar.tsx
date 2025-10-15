@@ -1,99 +1,61 @@
+// components/molecules/product/ProductTableToolbar.tsx
 "use client";
 
-import { Search, Moon, Sun } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Filter, Download, Plus, Search } from "lucide-react";
+
+interface ProductTableToolbarProps {
+  search: string;
+  onSearchChange: (value: string) => void;
+  onFilterClick: () => void;
+  onExportClick: () => void;
+  onNewProductClick: () => void;
+}
 
 export default function ProductTableToolbar({
-  searchTerm,
-  setSearchTerm,
-  category,
-  setCategory,
-  categories,
-  onExport,
-  sortBy,
-  setSortBy,
-  sortDir,
-  setSortDir,
-  darkMode,
-  setDarkMode,
-}: {
-  searchTerm: string;
-  setSearchTerm: (v: string) => void;
-  category: string;
-  setCategory: (v: string) => void;
-  categories: string[];
-  onExport: () => void;
-  sortBy: string;
-  setSortBy: (s: string) => void;
-  sortDir: "asc" | "desc";
-  setSortDir: (d: "asc" | "desc") => void;
-  darkMode: boolean;
-  setDarkMode: (b: boolean) => void;
-}) {
+  search,
+  onSearchChange,
+  onFilterClick,
+  onExportClick,
+  onNewProductClick,
+}: ProductTableToolbarProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-      <div className="flex gap-3 w-full sm:w-1/2">
-        <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Cari produk..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full border border-border rounded-lg pl-9 pr-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
-        </div>
-
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value === 'All Categories' ? '' : e.target.value)}
-          className="border border-border rounded-lg px-3 py-2 bg-background"
-        >
-          {categories.map((cat) => (
-            <option key={cat} value={cat === 'All Categories' ? '' : cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
+      {/* Search Input */}
+      <div className="relative w-full sm:max-w-md">
+        <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+        <Input
+          type="text"
+          placeholder="Search for id, name product"
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-10 pr-3 py-2 text-sm border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-300"
+        />
       </div>
 
-      <div className="flex items-center gap-2">
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="border border-border rounded-lg px-2 py-1 bg-background"
+      {/* Buttons */}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          onClick={onFilterClick}
+          className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100"
         >
-          <option value="">Sort by</option>
-          <option value="namaProduk">Nama</option>
-          <option value="kategori">Kategori</option>
-          <option value="hargaJualEcer">Harga Ecer</option>
-          <option value="hargaJualDus">Harga Dus</option>
-          <option value="isi">Isi</option>
-          <option value="persenLabaEcer">Persen Laba Ecer</option>
-          <option value="persenLabaDus">Persen Laba Dus</option>
-        </select>
-
-        <button
-          onClick={() => setSortDir(sortDir === "asc" ? "desc" : "asc")}
-          className="border border-border rounded-lg px-2 py-1"
-          title="Toggle sort direction"
+          <Filter className="w-4 h-4" /> Filter
+        </Button>
+        <Button
+          variant="outline"
+          onClick={onExportClick}
+          className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100"
         >
-          {sortDir === "asc" ? "Asc" : "Desc"}
-        </button>
-
-        <button
-          onClick={onExport}
-          className="bg-white border border-border px-3 py-1 rounded-lg hover:bg-muted"
+          <Download className="w-4 h-4" /> Export
+        </Button>
+        <Button
+          onClick={onNewProductClick}
+          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white shadow-md"
         >
-          Export CSV
-        </button>
-
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="p-2 rounded-lg border border-border"
-          title="Toggle theme"
-        >
-          {darkMode ? <Moon size={16} /> : <Sun size={16} />}
-        </button>
+          <Plus className="w-4 h-4" /> New Product
+        </Button>
       </div>
     </div>
   );

@@ -1,24 +1,13 @@
+// components/organisms/ProductPage.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import ProductTable from "@/components/molecules/product/ProductTable";
 import ProductFormModal from "@/components/molecules/product/ProductFormModal";
 import ProductTableToolbar from "@/components/molecules/product/ProductTableToolbar";
-import ProductSkeleton from "@/components/molecules/product/ProductSkeleton";
-import { useProductData } from "@/hooks/useProductData";
-import { useProductFilters } from "@/hooks/useProductFilters";
-import { useDarkMode } from "@/hooks/useDarkMode";
-import { usePagination } from "@/hooks/usePagination";
-
-interface ProductForm {
-  nama_produk: string;
-  harga_beli_sm: string;
-  harga_beli_sales: string;
-  kategori: string;
-  isi: string;
-  persen_laba_ecer: string;
-  persen_laba_dus: string;
-}
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Product {
   id: string;
@@ -34,235 +23,129 @@ interface Product {
 }
 
 export default function ProductPage() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const { products, loading, error, addProduct, updateProduct, deleteProduct, loadData } = useProductData();
-  const { darkMode, setDarkMode } = useDarkMode();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [offset, setOffset] = useState<string | null>(null);
+  const [nextOffset, setNextOffset] = useState<string | null>(null);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [search, setSearch] = useState<string>("");
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const {
-    searchTerm,
-    setSearchTerm,
-    category,
-    setCategory,
-    sortBy,
-    setSortBy,
-    sortDir,
-    setSortDir,
-    categories,
-    sortedProducts,
-    handleExport,
-  } = useProductFilters(products);
-
-  const {
-    page,
-    setPage,
-    rowsPerPage,
-    setRowsPerPage,
-    totalPages,
-    paginatedData,
-  } = usePagination(sortedProducts, 10);
-
-  const handleAddProduct = async (productForm: ProductForm) => {
-    const hargaBeliSm = Number(productForm.harga_beli_sm);
-    const isi = Number(productForm.isi);
-    const persenLabaEcer = Number(productForm.persen_laba_ecer) / 100;
-    const persenLabaDus = Number(productForm.persen_laba_dus) / 100;
-
-    const calculatedHargaJualDus = hargaBeliSm + (hargaBeliSm * persenLabaDus);
-    const calculatedHargaJualEcer = (hargaBeliSm / isi) + ((hargaBeliSm * persenLabaEcer) / isi);
-
-    // Rounding function
-    const roundUpTo = (value: number, to: number) => Math.ceil(value / to) * to;
-
-    // Round harga_jual_dus: if < 100000, round up to next 500, else to next 1000
-    const hargaJualDus = calculatedHargaJualDus < 100000 ? roundUpTo(calculatedHargaJualDus, 500) : roundUpTo(calculatedHargaJualDus, 1000);
-
-    // Round harga_jual_ecer: always round up to next 1000
-    const hargaJualEcer = roundUpTo(calculatedHargaJualEcer, 1000);
-
-    const product = {
-      namaProduk: productForm.nama_produk,
-      hargaBeliSm: hargaBeliSm,
-      hargaBeliSales: Number(productForm.harga_beli_sales),
-      hargaJualEcer: hargaJualEcer,
-      hargaJualDus: hargaJualDus,
-      kategori: productForm.kategori,
-      isi: isi,
-      persenLabaEcer: Number(productForm.persen_laba_ecer),
-      persenLabaDus: Number(productForm.persen_laba_dus),
-    };
-    try {
-      await addProduct(product);
-      setModalOpen(false);
-      setEditingProduct(null);
-      await loadData(); // Ensure loadData is awaited
-    } catch (error) {
-      console.error("Failed to add product:", error);
-    }
-  };
-
-  const handleEditProduct = async (productForm: ProductForm) => {
-    if (!editingProduct) return;
-    const hargaBeliSm = Number(productForm.harga_beli_sm);
-    const isi = Number(productForm.isi);
-    const persenLabaEcer = Number(productForm.persen_laba_ecer) / 100;
-    const persenLabaDus = Number(productForm.persen_laba_dus) / 100;
-
-    const calculatedHargaJualDus = hargaBeliSm + (hargaBeliSm * persenLabaDus);
-    const calculatedHargaJualEcer = (hargaBeliSm / isi) + ((hargaBeliSm * persenLabaEcer) / isi);
-
-    // Rounding function
-    const roundUpTo = (value: number, to: number) => Math.ceil(value / to) * to;
-
-    // Round harga_jual_dus: if < 100000, round up to next 500, else to next 1000
-    const hargaJualDus = calculatedHargaJualDus < 100000 ? roundUpTo(calculatedHargaJualDus, 500) : roundUpTo(calculatedHargaJualDus, 1000);
-
-    // Round harga_jual_ecer: always round up to next 1000
-    const hargaJualEcer = roundUpTo(calculatedHargaJualEcer, 1000);
-
-    const product = {
-      namaProduk: productForm.nama_produk,
-      hargaBeliSm: hargaBeliSm,
-      hargaBeliSales: Number(productForm.harga_beli_sales),
-      hargaJualEcer: hargaJualEcer,
-      hargaJualDus: hargaJualDus,
-      kategori: productForm.kategori,
-      isi: isi,
-      persenLabaEcer: Number(productForm.persen_laba_ecer),
-      persenLabaDus: Number(productForm.persen_laba_dus),
-    };
-    try {
-      await updateProduct(editingProduct.id, product);
-      setModalOpen(false);
-      setEditingProduct(null);
-      await loadData(); // Ensure loadData is awaited
-    } catch (error) {
-      console.error("Failed to edit product:", error);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (confirm("Yakin ingin menghapus produk ini?")) {
+  const fetchProducts = useCallback(
+    async (offsetValue?: string) => {
       try {
-        await deleteProduct(id);
-        await loadData(); // Ensure loadData is awaited
-      } catch (error) {
-        console.error("Failed to delete product:", error);
+        setLoading(true);
+        const params = new URLSearchParams({ pageSize: String(pageSize) });
+        if (offsetValue) params.append("offset", offsetValue);
+        if (search) params.append("search", search);
+
+        const res = await fetch(`/api/products?${params.toString()}`);
+        const data = await res.json();
+
+        setProducts(data.records);
+        setOffset(offsetValue || null);
+        setNextOffset(data.offset || null);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
       }
-    }
+    },
+    [pageSize, search]
+  );
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  const handleNext = () => {
+    if (nextOffset) fetchProducts(nextOffset);
+  };
+  const handlePrev = () => {
+    fetchProducts();
   };
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-semibold">Product Dashboard</h1>
-        <button
-          onClick={() => {
-            setEditingProduct(null);
-            setModalOpen(true);
-          }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          + Tambah Produk
-        </button>
-      </div>
-
+    <div className="space-y-6">
+      {/* === Toolbar === */}
       <ProductTableToolbar
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        category={category}
-        setCategory={setCategory}
-        categories={categories}
-        onExport={handleExport}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-        sortDir={sortDir}
-        setSortDir={setSortDir}
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
+        search={search}
+        onSearchChange={setSearch}
+        onFilterClick={() => console.log("Filter clicked")}
+        onExportClick={() => console.log("Export clicked")}
+        onNewProductClick={() => setShowModal(true)}
       />
 
-      {error ? (
-        <div className="text-center py-8 text-red-600">
-          <p>Error loading products: {error}</p>
-          <button
-            onClick={loadData}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Retry
-          </button>
-        </div>
-      ) : loading ? (
-        <ProductSkeleton />
-      ) : (
-        <ProductTable
-          products={paginatedData}
-          onEdit={(p) => {
-            setEditingProduct(p);
-            setModalOpen(true);
-          }}
-          onDelete={handleDelete}
-        />
-      )}
-
-      {/* pagination control */}
-      <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground border-t pt-3">
-        {/* Left info */}
-        <div>
-          {`${(page - 1) * rowsPerPage + 1} - ${Math.min(page * rowsPerPage, sortedProducts.length)} of ${sortedProducts.length} items`}
-        </div>
-
-        {/* Right controls */}
-        <div className="flex items-center gap-2">
-          {/* Rows per page selector */}
-          <div className="flex items-center gap-1">
-            <span>Rows per page:</span>
-            <select
-              value={rowsPerPage}
-              onChange={(e) => setRowsPerPage(Number(e.target.value))}
-              className="border rounded-md px-2 py-1 bg-background"
-            >
-              {[10, 20, 50, 100].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+      {/* === Product Table === */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        {loading ? (
+          <div className="p-6 space-y-2">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-10 w-full rounded-md" />
+            ))}
+            <div className="flex justify-center py-6">
+              <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+            </div>
           </div>
+        ) : (
+          // 🟣 Tambahkan wrapper scrollable di sini
+          <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg">
+            <ProductTable
+              products={products}
+              onEdit={(p: Product) => console.log("Edit", p)}
+              onDelete={(id: string) => console.log("Delete", id)}
+              onUpdate={(id: string, data: Omit<Product, 'id'>) => console.log("Update", id, data)}
+            />
+          </div>
+        )}
+      </div>
 
-          <span>The page on</span>
-          <select
-            value={page}
-            onChange={(e) => setPage(Number(e.target.value))}
-            className="border rounded-md px-2 py-1 bg-background"
+      {/* === Pagination === */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 text-sm text-gray-600 border-t pt-4">
+        <p className="text-gray-500">
+          <span className="font-medium text-gray-700">1–{pageSize}</span> of{" "}
+          <span className="text-gray-700">13 Pages</span>
+        </p>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePrev}
+            disabled={!offset || loading}
+            className="border-gray-300 text-gray-600 hover:bg-gray-100"
           >
-            {Array.from({ length: totalPages }, (_, i) => (
-              <option key={i + 1} value={i + 1}>
-                {i + 1}
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleNext}
+            disabled={!nextOffset || loading}
+            className="border-gray-300 text-gray-600 hover:bg-gray-100"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+
+          <select
+            value={pageSize}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+            className="border border-gray-300 rounded-lg text-sm px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-300"
+          >
+            {[10, 20, 50, 100].map((n) => (
+              <option key={n} value={n}>
+                {n}
               </option>
             ))}
           </select>
-
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-            className="border rounded-md px-2 py-1 hover:bg-muted disabled:opacity-50"
-          >
-            ‹
-          </button>
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
-            className="border rounded-md px-2 py-1 hover:bg-muted disabled:opacity-50"
-          >
-            ›
-          </button>
         </div>
       </div>
 
-      {modalOpen && (
+      {/* === Modal === */}
+      {showModal && (
         <ProductFormModal
-          onClose={() => setModalOpen(false)}
-          onSubmit={editingProduct ? handleEditProduct : handleAddProduct}
-          initialData={editingProduct || undefined}
+          onClose={() => setShowModal(false)}
+          onSubmit={() => fetchProducts()}
         />
       )}
     </div>

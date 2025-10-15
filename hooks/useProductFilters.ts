@@ -1,3 +1,4 @@
+// hooks/useProductFilters.ts
 import { useState, useMemo } from 'react';
 import { exportToCsv } from '@/lib/utils';
 

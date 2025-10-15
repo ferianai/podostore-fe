@@ -19,12 +19,14 @@ interface ProductTableProps {
   products: Product[];
   onEdit: (p: Product) => void;
   onDelete: (id: string) => void;
+  onUpdate: (id: string, updatedProduct: Omit<Product, "id">) => void;
 }
 
 export default function ProductTable({
   products,
   onEdit,
   onDelete,
+  onUpdate,
 }: ProductTableProps) {
   return (
     <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden">
@@ -50,6 +52,10 @@ export default function ProductTable({
               product={product}
               onEdit={onEdit}
               onDelete={onDelete}
+              onUpdate={async (id, updatedProduct) => {
+                // Here you would typically make an API call to update the product
+                console.log("Updating product:", id, updatedProduct);
+              }}
             />
           ))}
         </tbody>
