@@ -8,9 +8,8 @@ interface Product {
   hargaJualGrosir: number;
   hargaBeliSm: number;
   hargaBeliSales: number;
-  category: string;
-  qty: number;
-  status: string;
+  kategori: string;
+  isi: number;
 }
 
 export function useProductFilters(products: Product[]) {
@@ -21,13 +20,13 @@ export function useProductFilters(products: Product[]) {
   // Removed pagination logic; handle externally
 
   const categories = useMemo(() => {
-    const all = products.map((p) => p.category).filter(Boolean);
+    const all = products.map((p) => p.kategori).filter(Boolean);
     return Array.from(new Set(all));
   }, [products]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
-      const matchCategory = category ? p.category === category : true;
+      const matchCategory = category ? p.kategori === category : true;
       const name = (p.namaProduk || '').toString().toLowerCase();
       const matchSearch = name.includes(searchTerm.toLowerCase());
       return matchCategory && matchSearch;
@@ -63,9 +62,8 @@ export function useProductFilters(products: Product[]) {
       HargaJualGrosir: p.hargaJualGrosir,
       HargaBeliSM: p.hargaBeliSm,
       HargaBeliSales: p.hargaBeliSales,
-      Category: p.category,
-      Qty: p.qty,
-      Status: p.status,
+      Kategori: p.kategori,
+      Isi: p.isi,
     }));
     exportToCsv(`product-export-${new Date().toISOString().slice(0, 10)}.csv`, toExport);
   };
