@@ -36,9 +36,21 @@ export function useProductData() {
     loadData();
   }, [loadData]);
 
+  const sanitizeProductInput = (product: Omit<Product, 'id'>): Omit<Product, 'id'> => ({
+    ...product,
+    hargaBeliSm: Number(product.hargaBeliSm),
+    hargaBeliSales: Number(product.hargaBeliSales),
+    hargaJualEcer: Number(product.hargaJualEcer),
+    hargaJualDus: Number(product.hargaJualDus),
+    isi: Number(product.isi),
+    persenLabaEcer: Number(product.persenLabaEcer),
+    persenLabaDus: Number(product.persenLabaDus),
+  });
+
   const handleAddProduct = useCallback(async (product: Omit<Product, 'id'>) => {
     try {
-      const newProduct = await addProduct(product);
+      const sanitizedProduct = sanitizeProductInput(product);
+      const newProduct = await addProduct(sanitizedProduct);
       setProducts(prev => [...prev, newProduct.fields]);
       return newProduct;
     } catch (err) {
@@ -49,7 +61,8 @@ export function useProductData() {
 
   const handleUpdateProduct = useCallback(async (id: string, product: Omit<Product, 'id'>) => {
     try {
-      const updatedProduct = await updateProduct(id, product);
+      const sanitizedProduct = sanitizeProductInput(product);
+      const updatedProduct = await updateProduct(id, sanitizedProduct);
       setProducts(prev => prev.map(p => p.id === id ? updatedProduct.fields : p));
       return updatedProduct;
     } catch (err) {
