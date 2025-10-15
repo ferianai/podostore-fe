@@ -41,7 +41,7 @@ export async function getProductList(options: {
 
   // Map Airtable fields → app fields
   const mapped = data.records.map(
-    (r: { id: string; fields: Record<string, any> }) => ({
+    (r: { id: string; fields: Record<string, string | number | null | undefined> }) => ({
       id: r.id,
       namaProduk: r.fields.Nama_Produk || "",
       hargaBeliSales: r.fields.Harga_Beli_Sales || 0,

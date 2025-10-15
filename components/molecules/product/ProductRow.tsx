@@ -38,7 +38,8 @@ export default function ProductRow({ product, onEdit, onDelete }: ProductRowProp
     setSaving(true);
     const updated = { ...currentProduct, [field]: tempValue };
     try {
-      await updateProduct(updated.id, { [field]: tempValue });
+      const { id, ...productData } = updated;
+      await updateProduct(id, productData);
       setCurrentProduct(updated);
     } catch (err) {
       console.error("Update failed:", err);
