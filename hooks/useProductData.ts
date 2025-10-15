@@ -9,8 +9,7 @@ interface Product {
   hargaBeliSm: number;
   hargaBeliSales: number;
   kategori: string;
-  qty: number;
-  status: string;
+  isi: number;
 }
 
 export function useProductData() {

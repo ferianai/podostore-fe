@@ -18,7 +18,6 @@ interface ProductForm {
   harga_jual_grosir: string;
   kategori: string;
   isi: string;
-  status: string;
 }
 
 interface Product {
@@ -30,7 +29,6 @@ interface Product {
   hargaJualGrosir: number;
   kategori: string;
   isi: number;
-  status: string;
 }
 
 export default function ProductPage() {
@@ -69,9 +67,8 @@ export default function ProductPage() {
       hargaBeliSales: Number(productForm.harga_beli_sales),
       hargaJualEcer: Number(productForm.harga_jual_ecer),
       hargaJualGrosir: Number(productForm.harga_jual_grosir),
-      category: productForm.kategori,
-      qty: Number(productForm.isi),
-      status: productForm.status,
+      kategori: productForm.kategori,
+      isi: Number(productForm.isi),
     };
     try {
       await addProduct(product);
@@ -91,9 +88,8 @@ export default function ProductPage() {
       hargaBeliSales: Number(productForm.harga_beli_sales),
       hargaJualEcer: Number(productForm.harga_jual_ecer),
       hargaJualGrosir: Number(productForm.harga_jual_grosir),
-      category: productForm.kategori,
-      qty: Number(productForm.isi),
-      status: productForm.status,
+      kategori: productForm.kategori,
+      isi: Number(productForm.isi),
     };
     try {
       await updateProduct(editingProduct.id, product);

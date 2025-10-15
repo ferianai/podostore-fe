@@ -14,13 +14,13 @@ interface ProductForm {
 
 interface Product {
   id: number;
-  nama_produk: string;
-  harga_beli_sm: string;
-  harga_beli_sales: string;
-  harga_jual_ecer: string;
-  harga_jual_grosir: string;
+  namaProduk: string;
+  hargaBeliSm: number;
+  hargaBeliSales: number;
+  hargaJualEcer: number;
+  hargaJualGrosir: number;
   kategori: string;
-  isi: string;
+  isi: number;
 }
 
 interface ProductFormModalProps {
@@ -47,11 +47,11 @@ export default function ProductFormModal({
   useEffect(() => {
     if (initialData) {
       setForm({
-        nama_produk: initialData.nama_produk || "",
-        harga_beli_sm: String(initialData.harga_beli_sm || ""),
-        harga_beli_sales: String(initialData.harga_beli_sales || ""),
-        harga_jual_ecer: String(initialData.harga_jual_ecer || ""),
-        harga_jual_grosir: String(initialData.harga_jual_grosir || ""),
+        nama_produk: initialData.namaProduk || "",
+        harga_beli_sm: String(initialData.hargaBeliSm || ""),
+        harga_beli_sales: String(initialData.hargaBeliSales || ""),
+        harga_jual_ecer: String(initialData.hargaJualEcer || ""),
+        harga_jual_grosir: String(initialData.hargaJualGrosir || ""),
         kategori: initialData.kategori || "",
         isi: String(initialData.isi || ""),
       });
@@ -159,10 +159,10 @@ export default function ProductFormModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium">Qty</label>
+            <label className="block text-sm font-medium">Isi</label>
             <input
               type="number"
-              name="qty"
+              name="isi"
               value={form.isi}
               onChange={handleChange}
               className="w-full border border-border rounded-md p-2 bg-background"
