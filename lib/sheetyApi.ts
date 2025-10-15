@@ -18,13 +18,12 @@ export async function addProduct(product: any) {
   const payload = {
     product: {
       namaProduk: product.namaProduk,
-      hargaJualEcer: product.hargaJualEcer,
-      hargaJualGrosir: product.hargaJualGrosir,
       hargaBeliSm: product.hargaBeliSm,
       hargaBeliSales: product.hargaBeliSales,
-      category: product.category,
-      qty: product.qty,
-      status: product.status,
+      hargaJualEcer: product.hargaJualEcer,
+      hargaJualGrosir: product.hargaJualGrosir,
+      kategori: product.kategori,
+      isi: product.isi,
     },
   };
   console.log("addProduct payload:", JSON.stringify(payload, null, 2));
@@ -53,13 +52,12 @@ export async function updateProduct(id: number, product: any) {
     body: JSON.stringify({
       product: {
         namaProduk: product.namaProduk,
-        hargaJualEcer: product.hargaJualEcer,
-        hargaJualGrosir: product.hargaJualGrosir,
         hargaBeliSm: product.hargaBeliSm,
         hargaBeliSales: product.hargaBeliSales,
-        category: product.category,
-        qty: product.qty,
-        status: product.status,
+        hargaJualEcer: product.hargaJualEcer,
+        hargaJualGrosir: product.hargaJualGrosir,
+        kategori: product.kategori,
+        isi: product.isi,
       },
     }),
   });

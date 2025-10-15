@@ -12,24 +12,24 @@ import { usePagination } from "@/hooks/usePagination";
 
 interface ProductForm {
   nama_produk: string;
-  harga_jual_ecer: string;
-  harga_jual_grosir: string;
   harga_beli_sm: string;
   harga_beli_sales: string;
-  category: string;
-  qty: string;
+  harga_jual_ecer: string;
+  harga_jual_grosir: string;
+  kategori: string;
+  isi: string;
   status: string;
 }
 
 interface Product {
   id: number;
   namaProduk: string;
-  hargaJualEcer: number;
-  hargaJualGrosir: number;
   hargaBeliSm: number;
   hargaBeliSales: number;
-  category: string;
-  qty: number;
+  hargaJualEcer: number;
+  hargaJualGrosir: number;
+  kategori: string;
+  isi: number;
   status: string;
 }
 
@@ -65,12 +65,12 @@ export default function ProductPage() {
   const handleAddProduct = async (productForm: ProductForm) => {
     const product = {
       namaProduk: productForm.nama_produk,
-      hargaJualEcer: Number(productForm.harga_jual_ecer),
-      hargaJualGrosir: Number(productForm.harga_jual_grosir),
       hargaBeliSm: Number(productForm.harga_beli_sm),
       hargaBeliSales: Number(productForm.harga_beli_sales),
-      category: productForm.category,
-      qty: Number(productForm.qty),
+      hargaJualEcer: Number(productForm.harga_jual_ecer),
+      hargaJualGrosir: Number(productForm.harga_jual_grosir),
+      category: productForm.kategori,
+      qty: Number(productForm.isi),
       status: productForm.status,
     };
     try {
@@ -87,12 +87,12 @@ export default function ProductPage() {
     if (!editingProduct) return;
     const product = {
       namaProduk: productForm.nama_produk,
-      hargaJualEcer: Number(productForm.harga_jual_ecer),
-      hargaJualGrosir: Number(productForm.harga_jual_grosir),
       hargaBeliSm: Number(productForm.harga_beli_sm),
       hargaBeliSales: Number(productForm.harga_beli_sales),
-      category: productForm.category,
-      qty: Number(productForm.qty),
+      hargaJualEcer: Number(productForm.harga_jual_ecer),
+      hargaJualGrosir: Number(productForm.harga_jual_grosir),
+      category: productForm.kategori,
+      qty: Number(productForm.isi),
       status: productForm.status,
     };
     try {

@@ -4,25 +4,23 @@ import { useState, useEffect } from "react";
 
 interface ProductForm {
   nama_produk: string;
-  harga_jual_ecer: string;
-  harga_jual_grosir: string;
   harga_beli_sm: string;
   harga_beli_sales: string;
-  category: string;
-  qty: string;
-  status: string;
+  harga_jual_ecer: string;
+  harga_jual_grosir: string;
+  kategori: string;
+  isi: string;
 }
 
 interface Product {
   id: number;
-  namaProduk: string;
-  hargaJualEcer: number;
-  hargaJualGrosir: number;
-  hargaBeliSm: number;
-  hargaBeliSales: number;
-  category: string;
-  qty: number;
-  status: string;
+  nama_produk: string;
+  harga_beli_sm: string;
+  harga_beli_sales: string;
+  harga_jual_ecer: string;
+  harga_jual_grosir: string;
+  kategori: string;
+  isi: string;
 }
 
 interface ProductFormModalProps {
@@ -42,33 +40,30 @@ export default function ProductFormModal({
     harga_jual_grosir: "",
     harga_beli_sm: "",
     harga_beli_sales: "",
-    category: "",
-    qty: "",
-    status: "Available",
+    kategori: "",
+    isi: ""
   });
 
   useEffect(() => {
     if (initialData) {
       setForm({
-        nama_produk: initialData.namaProduk || "",
-        harga_jual_ecer: String(initialData.hargaJualEcer || ""),
-        harga_jual_grosir: String(initialData.hargaJualGrosir || ""),
-        harga_beli_sm: String(initialData.hargaBeliSm || ""),
-        harga_beli_sales: String(initialData.hargaBeliSales || ""),
-        category: initialData.category || "",
-        qty: String(initialData.qty || ""),
-        status: initialData.status || "Available",
+        nama_produk: initialData.nama_produk || "",
+        harga_beli_sm: String(initialData.harga_beli_sm || ""),
+        harga_beli_sales: String(initialData.harga_beli_sales || ""),
+        harga_jual_ecer: String(initialData.harga_jual_ecer || ""),
+        harga_jual_grosir: String(initialData.harga_jual_grosir || ""),
+        kategori: initialData.kategori || "",
+        isi: String(initialData.isi || ""),
       });
     } else {
       setForm({
         nama_produk: "",
-        harga_jual_ecer: "",
-        harga_jual_grosir: "",
         harga_beli_sm: "",
         harga_beli_sales: "",
-        category: "",
-        qty: "",
-        status: "Available",
+        harga_jual_ecer: "",
+        harga_jual_grosir: "",
+        kategori: "",
+        isi: "",
       });
     }
   }, [initialData]);
@@ -104,30 +99,6 @@ export default function ProductFormModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium">Harga Jual Ecer</label>
-            <input
-              type="number"
-              name="harga_jual_ecer"
-              value={form.harga_jual_ecer}
-              onChange={handleChange}
-              className="w-full border border-border rounded-md p-2 bg-background"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium">Harga Jual Grosir</label>
-            <input
-              type="number"
-              name="harga_jual_grosir"
-              value={form.harga_jual_grosir}
-              onChange={handleChange}
-              className="w-full border border-border rounded-md p-2 bg-background"
-              required
-            />
-          </div>
-
-          <div>
             <label className="block text-sm font-medium">Harga Beli SM</label>
             <input
               type="number"
@@ -152,11 +123,35 @@ export default function ProductFormModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium">Category</label>
+            <label className="block text-sm font-medium">Harga Jual Ecer</label>
+            <input
+              type="number"
+              name="harga_jual_ecer"
+              value={form.harga_jual_ecer}
+              onChange={handleChange}
+              className="w-full border border-border rounded-md p-2 bg-background"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Harga Jual Grosir</label>
+            <input
+              type="number"
+              name="harga_jual_grosir"
+              value={form.harga_jual_grosir}
+              onChange={handleChange}
+              className="w-full border border-border rounded-md p-2 bg-background"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Kategori</label>
             <input
               type="text"
-              name="category"
-              value={form.category}
+              name="kategori"
+              value={form.kategori}
               onChange={handleChange}
               className="w-full border border-border rounded-md p-2 bg-background"
               required
@@ -168,24 +163,11 @@ export default function ProductFormModal({
             <input
               type="number"
               name="qty"
-              value={form.qty}
+              value={form.isi}
               onChange={handleChange}
               className="w-full border border-border rounded-md p-2 bg-background"
               required
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium">Status</label>
-            <select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-              className="w-full border border-border rounded-md p-2 bg-background"
-            >
-              <option value="Available">Available</option>
-              <option value="Out of Stock">Out of Stock</option>
-            </select>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">

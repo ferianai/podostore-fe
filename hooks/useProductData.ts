@@ -8,7 +8,7 @@ interface Product {
   hargaJualGrosir: number;
   hargaBeliSm: number;
   hargaBeliSales: number;
-  category: string;
+  kategori: string;
   qty: number;
   status: string;
 }

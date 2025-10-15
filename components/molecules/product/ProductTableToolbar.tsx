@@ -65,8 +65,9 @@ export default function ProductTableToolbar({
         >
           <option value="">Sort by</option>
           <option value="namaProduk">Nama</option>
+          <option value="k">kategori</option>
           <option value="hargaJualEcer">Harga Ecer</option>
-          <option value="qty">Qty</option>
+          <option value="isi">Isi</option>
         </select>
 
         <button
