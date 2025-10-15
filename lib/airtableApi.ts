@@ -44,14 +44,14 @@ export async function getProductList(options: {
     (r: { id: string; fields: Record<string, string | number | null | undefined> }) => ({
       id: r.id,
       namaProduk: r.fields.Nama_Produk || "",
-      hargaBeliSales: r.fields.Harga_Beli_Sales || 0,
-      hargaBeliSm: r.fields.Harga_Beli_SM || 0,
-      hargaJualEcer: r.fields.Harga_Jual_Ecer || 0,
-      hargaJualDus: r.fields.Harga_Jual_Dus || 0,
+      hargaBeliSales: Number(r.fields.Harga_Beli_Sales) || 0,
+      hargaBeliSm: Number(r.fields.Harga_Beli_SM) || 0,
+      hargaJualEcer: Number(r.fields.Harga_Jual_Ecer) || 0,
+      hargaJualDus: Number(r.fields.Harga_Jual_Dus) || 0,
       kategori: r.fields.Kategori || "",
-      isi: r.fields.Isi || 0,
-      persenLabaEcer: r.fields.Persen_Laba_Ecer || 0,
-      persenLabaDus: r.fields.Persen_Laba_Dus || 0,
+      isi: Number(r.fields.Isi) || 0,
+      persenLabaEcer: Number(r.fields.Persen_Laba_Ecer) || 0,
+      persenLabaDus: Number(r.fields.Persen_Laba_Dus) || 0,
     })
   );
 
