@@ -29,35 +29,54 @@ export default function ProductTable({
   onUpdate,
 }: ProductTableProps) {
   return (
-    <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden">
-      <table className="min-w-full text-sm text-foreground">
-        <thead className="bg-muted text-muted-foreground text-left">
+    <div
+      className="relative w-full overflow-auto rounded-lg scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+      style={{ maxHeight: "700px" }}
+    >
+      <table className="min-w-[1200px] w-full border-collapse text-sm text-foreground">
+        {/* === Sticky Header === */}
+        <thead className="bg-gray-100 text-gray-700 sticky top-0 z-30">
           <tr>
-            <th className="px-4 py-3 ">Nama Produk</th>
-            <th className="px-4 py-3">Harga Beli SM</th>
-            <th className="px-4 py-3">Harga Beli Sales</th>
-            <th className="px-4 py-3">Harga Jual Ecer</th>
-            <th className="px-4 py-3">Harga Jual Dus</th>
-            <th className="px-4 py-3">Kategori</th>
-            <th className="px-4 py-3 text-center">Isi</th>
-            <th className="px-4 py-3 text-center">Persen Laba Ecer</th>
-            <th className="px-4 py-3 text-center">Persen Laba Dus</th>
-            <th className="px-4 py-3 text-right">Action</th>
+            <th
+              className="px-4 py-2 text-left whitespace-nowrap sticky left-0 z-40 bg-gray-100 border-r border-gray-200"
+              style={{ boxShadow: "2px 0 3px rgba(0,0,0,0.05)" }}
+            >
+              Nama Produk
+            </th>
+            <th className="px-2 py-2">Harga Beli SM</th>
+            <th className="px-4 py-2">Harga Beli Sales</th>
+            <th className="px-4 py-2">Harga Jual Ecer</th>
+            <th className="px-4 py-2">Harga Jual Dus</th>
+            <th className="px-4 py-2">Kategori</th>
+            <th className="px-4 py-2 text-center">Isi</th>
+            <th className="px-4 py-2 text-center">Persen Laba Ecer</th>
+            <th className="px-4 py-2 text-center">Persen Laba Dus</th>
+            <th className="px-4 py-2 text-right">Action</th>
           </tr>
         </thead>
-        <tbody>
-          {products.map((product) => (
-            <ProductRow
-              key={product.id}
-              product={product}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onUpdate={async (id, updatedProduct) => {
-                // Here you would typically make an API call to update the product
-                console.log("Updating product:", id, updatedProduct);
-              }}
-            />
-          ))}
+
+        {/* === Body === */}
+        <tbody className="divide-y divide-gray-200 bg-white">
+          {products.length > 0 ? (
+            products.map((product) => (
+              <ProductRow
+                key={product.id}
+                product={product}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onUpdate={onUpdate}
+              />
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={10}
+                className="px-4 py-6 text-center text-gray-500 italic"
+              >
+                Tidak ada produk yang ditemukan.
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

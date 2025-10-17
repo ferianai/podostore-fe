@@ -66,7 +66,7 @@ export default function ProductPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-[1600px] mx-auto px-4">
       {/* === Toolbar === */}
       <ProductTableToolbar
         search={search}
@@ -89,7 +89,7 @@ export default function ProductPage() {
           </div>
         ) : (
           // 🟣 Tambahkan wrapper scrollable di sini
-          <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-lg">
+          <div >
             <ProductTable
               products={products}
               onEdit={(p: Product) => console.log("Edit", p)}
@@ -132,7 +132,7 @@ export default function ProductPage() {
             onChange={(e) => setPageSize(Number(e.target.value))}
             className="border border-gray-300 rounded-lg text-sm px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-300"
           >
-            {[10, 20, 50, 100].map((n) => (
+            {[100, 200, 500].map((n) => (
               <option key={n} value={n}>
                 {n}
               </option>

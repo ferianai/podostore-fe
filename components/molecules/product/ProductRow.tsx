@@ -1,4 +1,3 @@
-// components/molecules/product/ProductRow.tsx
 "use client";
 
 import { useState } from "react";
@@ -55,20 +54,32 @@ export default function ProductRow({
     }
   };
 
-  const renderCell = (field: keyof Product, isCurrency = false, align = "left") => {
+  const renderCell = (
+    field: keyof Product,
+    isCurrency = false,
+    align: "left" | "center" | "right" = "left",
+    isSticky = false
+  ) => {
     const value = currentProduct[field];
+    const baseClasses = `px-4 text-${align} cursor-pointer hover:bg-muted/40 whitespace-nowrap`;
+
+    const stickyClasses = isSticky
+      ? "sticky left-0 z-20 bg-white font-medium border-r border-border shadow-sm"
+      : "";
 
     if (editingField === field) {
       return (
-        <td className={`px-4 py-3 text-${align}`}>
+        <td className={`${baseClasses} ${stickyClasses}`}>
           <input
             type={typeof value === "number" ? "number" : "text"}
-            className="border rounded-md px-2 py-1 w-full text-sm"
+            className="border rounded-md py-1 w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
             value={tempValue}
             autoFocus
             onChange={(e) =>
               setTempValue(
-                typeof value === "number" ? Number(e.target.value) : e.target.value
+                typeof value === "number"
+                  ? Number(e.target.value)
+                  : e.target.value
               )
             }
             onBlur={() => handleSave(field)}
@@ -80,9 +91,9 @@ export default function ProductRow({
 
     return (
       <td
-        className={`px-4 py-3 text-${align} cursor-pointer hover:bg-muted/40`}
+        className={`${baseClasses} ${stickyClasses}`}
         onClick={(e) => {
-          e.stopPropagation(); // mencegah event sampai ke icon edit/modal
+          e.stopPropagation();
           handleEditInline(field, value);
         }}
       >
@@ -93,10 +104,10 @@ export default function ProductRow({
 
   return (
     <tr
-      className="border-b hover:bg-muted/50 transition"
-      onClick={(e) => e.stopPropagation()} // cegah bubble ke parent
+      className="border-b hover:bg-muted/50 transition-colors"
+      onClick={(e) => e.stopPropagation()}
     >
-      {renderCell("namaProduk")}
+      {renderCell("namaProduk", false, "left", true)}
       {renderCell("hargaBeliSm", true)}
       {renderCell("hargaBeliSales", true)}
       {renderCell("hargaJualEcer", true)}
@@ -105,7 +116,7 @@ export default function ProductRow({
       {renderCell("isi", false, "center")}
       {renderCell("persenLabaEcer", false, "center")}
       {renderCell("persenLabaDus", false, "center")}
-      <td className="px-4 py-3 flex items-center gap-2 justify-end text-muted-foreground">
+      <td className="px-4 py-1 flex items-center gap-2 justify-end text-muted-foreground min-w-[100px]">
         {saving ? (
           <Loader2 size={16} className="animate-spin text-blue-500" />
         ) : (
@@ -114,7 +125,7 @@ export default function ProductRow({
               size={16}
               className="cursor-pointer hover:text-blue-600"
               onClick={(e) => {
-                e.stopPropagation(); // hanya buka modal edit
+                e.stopPropagation();
                 onEdit(currentProduct);
               }}
             />
