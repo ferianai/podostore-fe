@@ -24,7 +24,6 @@ interface Product {
 export default function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
-  const [filtered, setFiltered] = useState<Product[]>([]);
   const [offset, setOffset] = useState<string | null>(null);
   const [nextOffset, setNextOffset] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -43,14 +42,15 @@ export default function ProductPage() {
         const params = new URLSearchParams({ pageSize: String(pageSize) });
         if (offsetValue) params.append("offset", offsetValue);
         if (search) params.append("search", search);
+        if (category !== "all") params.append("kategori", category);
 
         const res = await fetch(`/api/products?${params.toString()}`);
         const data = await res.json();
 
         setProducts(data.records);
-        setFiltered(data.records);
         setOffset(offsetValue || null);
         setNextOffset(data.offset || null);
+        setTotalProducts(data.totalCount || 0);
         if (pageNum) setCurrentPage(pageNum);
       } catch (err) {
         console.error("Error fetching products:", err);
@@ -58,75 +58,13 @@ export default function ProductPage() {
         setLoading(false);
       }
     },
-    [pageSize, search]
+    [pageSize, search, category]
   );
 
   useEffect(() => {
     fetchProducts(undefined, 1);
   }, [fetchProducts]);
 
-  // === Filter, Search, Sort ===
-  useEffect(() => {
-    let result = [...products];
-
-    if (category !== "all") {
-      result = result.filter(
-        (p) => p.kategori?.toLowerCase() === category.toLowerCase()
-      );
-    }
-
-    if (search) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.namaProduk.toLowerCase().includes(q) ||
-          p.id.toLowerCase().includes(q)
-      );
-    }
-
-    result.sort((a, b) =>
-      sortOrder === "asc"
-        ? a.namaProduk.localeCompare(b.namaProduk)
-        : b.namaProduk.localeCompare(a.namaProduk)
-    );
-
-    setFiltered(result);
-  }, [search, category, sortOrder, products]);
-
-  // === Export ===
-  const handleExport = () => {
-    const csv = [
-      [
-        "Nama Produk",
-        "Harga Beli SM",
-        "Harga Beli Sales",
-        "Harga Jual Ecer",
-        "Harga Jual Dus",
-        "Kategori",
-        "Isi",
-      ],
-      ...filtered.map((p) => [
-        p.namaProduk,
-        p.hargaBeliSm,
-        p.hargaBeliSales,
-        p.hargaJualEcer,
-        p.hargaJualDus,
-        p.kategori,
-        p.isi,
-      ]),
-    ]
-      .map((row) => row.join(","))
-      .join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "products.csv";
-    a.click();
-  };
-
-  // === Pagination ===
   const handleNext = () => {
     if (nextOffset) fetchProducts(nextOffset, currentPage + 1);
   };
@@ -134,29 +72,22 @@ export default function ProductPage() {
     if (currentPage > 1) fetchProducts(undefined, currentPage - 1);
   };
 
-  const sortedCategories = [
-    "all",
-    ...Array.from(new Set(products.map((p) => p.kategori))).sort((a, b) =>
-      a.localeCompare(b)
-    ),
-  ];
+  const totalPages = Math.ceil(totalProducts / pageSize) || 1;
 
   return (
     <div className="space-y-6 w-full max-w-[1600px] mx-auto px-4">
-      {/* === Toolbar === */}
       <ProductTableToolbar
         search={search}
         category={category}
         sortOrder={sortOrder}
-        categories={sortedCategories}
+        categories={[...Array.from(new Set(products.map((p) => p.kategori)))]}
         onSearchChange={setSearch}
         onCategoryChange={setCategory}
         onSortChange={setSortOrder}
-        onExportClick={handleExport}
+        onExportClick={() => window.open("/api/products?export=true", "_blank")}
         onNewProductClick={() => setShowModal(true)}
       />
 
-      {/* === Table === */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="p-6 space-y-2">
@@ -169,7 +100,7 @@ export default function ProductPage() {
           </div>
         ) : (
           <ProductTable
-            products={filtered}
+            products={products}
             onEdit={(p: Product) => console.log("Edit", p)}
             onDelete={(id: string) => console.log("Delete", id)}
             onUpdate={(id: string, data: Omit<Product, "id">) =>
@@ -181,16 +112,12 @@ export default function ProductPage() {
         )}
       </div>
 
-      {/* === Pagination Control === */}
+      {/* Pagination */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 text-sm text-gray-600 border-t pt-4">
         <p className="text-gray-600">
-          <span className="font-medium text-gray-800">
-            Halaman {currentPage}
-          </span>{" "}
+          <span className="font-medium text-gray-800">Halaman {currentPage}</span>{" "}
           dari{" "}
-          <span className="font-medium text-gray-800">
-            {Math.ceil(filtered.length / pageSize) || 1}
-          </span>
+          <span className="font-medium text-gray-800">{totalPages}</span>
         </p>
 
         <div className="flex items-center gap-2">
@@ -202,7 +129,6 @@ export default function ProductPage() {
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
-
           <Button
             variant="outline"
             size="sm"
@@ -226,7 +152,6 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* === Modal === */}
       {showModal && (
         <ProductFormModal
           onClose={() => setShowModal(false)}

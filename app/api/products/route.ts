@@ -1,4 +1,3 @@
-// app/api/products/route.ts
 import { NextResponse } from "next/server";
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY!;
@@ -11,7 +10,27 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-// GET
+// Fungsi bantu untuk hitung total record (loop semua halaman Airtable)
+async function getAllRecordsCount(filterFormula?: string) {
+  let count = 0;
+  let offset = "";
+
+  do {
+    const url = new URL(BASE_URL);
+    if (filterFormula) url.searchParams.set("filterByFormula", filterFormula);
+    if (offset) url.searchParams.set("offset", offset);
+
+    const res = await fetch(url.toString(), { headers, cache: "no-store" });
+    if (!res.ok) break;
+    const data = await res.json();
+    count += data.records?.length || 0;
+    offset = data.offset || "";
+  } while (offset);
+
+  return count;
+}
+
+// === GET ===
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const pageSize = Number(searchParams.get("pageSize")) || 10;
@@ -20,9 +39,9 @@ export async function GET(request: Request) {
   const kategori = searchParams.get("kategori") || "";
   const exportData = searchParams.get("export") === "true";
 
+  // === Filter formula ===
   let filterFormula = "";
   if (search) {
-    // Search by ID or Nama_Produk
     filterFormula = `OR(FIND(LOWER("${search}"), LOWER({Nama_Produk})), FIND("${search}", RECORD_ID()))`;
   }
   if (kategori) {
@@ -30,6 +49,7 @@ export async function GET(request: Request) {
     filterFormula = filterFormula ? `AND(${filterFormula}, ${kategoriFilter})` : kategoriFilter;
   }
 
+  // === Fetch data halaman aktif ===
   const queryParams = new URLSearchParams({
     ...(pageSize && !exportData ? { pageSize: String(pageSize) } : {}),
     ...(offset && !exportData ? { offset } : {}),
@@ -44,10 +64,7 @@ export async function GET(request: Request) {
   if (!res.ok) {
     const text = await res.text();
     console.error("Airtable error:", text);
-    return NextResponse.json(
-      { error: "Failed to fetch products" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
   }
 
   const data = await res.json();
@@ -68,11 +85,14 @@ export async function GET(request: Request) {
   );
 
   if (exportData) {
-    // Generate CSV
-    const csvHeaders = "ID,Nama Produk,Harga Beli SM,Harga Beli Sales,Harga Jual Ecer,Harga Jual Dus,Kategori,Isi,Persen Laba Ecer,Persen Laba Dus\n";
-    const csvRows = mappedRecords.map(r =>
-      `${r.id},"${r.namaProduk}",${r.hargaBeliSm},${r.hargaBeliSales},${r.hargaJualEcer},${r.hargaJualDus},"${r.kategori}",${r.isi},${r.persenLabaEcer},${r.persenLabaDus}`
-    ).join("\n");
+    const csvHeaders =
+      "ID,Nama Produk,Harga Beli SM,Harga Beli Sales,Harga Jual Ecer,Harga Jual Dus,Kategori,Isi,Persen Laba Ecer,Persen Laba Dus\n";
+    const csvRows = mappedRecords
+      .map(
+        (r) =>
+          `${r.id},"${r.namaProduk}",${r.hargaBeliSm},${r.hargaBeliSales},${r.hargaJualEcer},${r.hargaJualDus},"${r.kategori}",${r.isi},${r.persenLabaEcer},${r.persenLabaDus}`
+      )
+      .join("\n");
     const csv = csvHeaders + csvRows;
 
     return new Response(csv, {
@@ -83,17 +103,20 @@ export async function GET(request: Request) {
     });
   }
 
+  // === Hitung total record ===
+  const totalCount = await getAllRecordsCount(filterFormula);
+
   return NextResponse.json({
     records: mappedRecords,
     offset: data.offset || null,
+    totalCount,
   });
 }
 
-// POST
+// === POST ===
 export async function POST(request: Request) {
   try {
     const product = await request.json();
-
     const payload = {
       records: [
         {
@@ -132,11 +155,10 @@ export async function POST(request: Request) {
   }
 }
 
-// PATCH (UPDATE)
+// === PATCH ===
 export async function PATCH(request: Request) {
   try {
     const { id, ...product } = await request.json();
-
     const payload = {
       records: [
         {
@@ -176,7 +198,7 @@ export async function PATCH(request: Request) {
   }
 }
 
-// DELETE
+// === DELETE ===
 export async function DELETE(request: Request) {
   try {
     const url = new URL(request.url);
