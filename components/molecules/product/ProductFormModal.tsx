@@ -163,7 +163,7 @@ export default function ProductFormModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium">Persen Laba Dus</label>
+            <label className="block text-sm font-medium">Laba Dus</label>
             <input
               type="text"
               name="persen_laba_dus"

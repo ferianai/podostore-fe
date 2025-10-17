@@ -1,4 +1,3 @@
-// components/organisms/ProductPage.tsx
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -24,13 +23,17 @@ interface Product {
 
 export default function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [filtered, setFiltered] = useState<Product[]>([]);
   const [offset, setOffset] = useState<string | null>(null);
   const [nextOffset, setNextOffset] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState<number>(10);
   const [search, setSearch] = useState<string>("");
+  const [category, setCategory] = useState<string>("all");
+  const [sortOrder, setSortOrder] = useState<string>("asc");
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
+  // === Fetch Product Data ===
   const fetchProducts = useCallback(
     async (offsetValue?: string) => {
       try {
@@ -43,6 +46,7 @@ export default function ProductPage() {
         const data = await res.json();
 
         setProducts(data.records);
+        setFiltered(data.records);
         setOffset(offsetValue || null);
         setNextOffset(data.offset || null);
       } catch (err) {
@@ -58,6 +62,71 @@ export default function ProductPage() {
     fetchProducts();
   }, [fetchProducts]);
 
+  // === Handle Filter & Sort ===
+  useEffect(() => {
+    let result = [...products];
+
+    // Filter kategori
+    if (category !== "all") {
+      result = result.filter(
+        (p) => p.kategori?.toLowerCase() === category.toLowerCase()
+      );
+    }
+
+    // Search
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.namaProduk.toLowerCase().includes(q) ||
+          p.id.toLowerCase().includes(q)
+      );
+    }
+
+    // Sort
+    result.sort((a, b) =>
+      sortOrder === "asc"
+        ? a.namaProduk.localeCompare(b.namaProduk)
+        : b.namaProduk.localeCompare(a.namaProduk)
+    );
+
+    setFiltered(result);
+  }, [search, category, sortOrder, products]);
+
+  // === Handle Export ===
+  const handleExport = () => {
+    const csv = [
+      [
+        "Nama Produk",
+        "Harga Beli SM",
+        "Harga Beli Sales",
+        "Harga Jual Ecer",
+        "Harga Jual Dus",
+        "Kategori",
+        "Isi",
+      ],
+      ...filtered.map((p) => [
+        p.namaProduk,
+        p.hargaBeliSm,
+        p.hargaBeliSales,
+        p.hargaJualEcer,
+        p.hargaJualDus,
+        p.kategori,
+        p.isi,
+      ]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "products.csv";
+    a.click();
+  };
+
+  // === Pagination ===
   const handleNext = () => {
     if (nextOffset) fetchProducts(nextOffset);
   };
@@ -70,9 +139,13 @@ export default function ProductPage() {
       {/* === Toolbar === */}
       <ProductTableToolbar
         search={search}
+        category={category}
+        sortOrder={sortOrder}
+        categories={[...new Set(products.map((p) => p.kategori))]} // 🔹 ambil kategori unik
         onSearchChange={setSearch}
-        onFilterClick={() => console.log("Filter clicked")}
-        onExportClick={() => console.log("Export clicked")}
+        onCategoryChange={setCategory}
+        onSortChange={setSortOrder}
+        onExportClick={handleExport}
         onNewProductClick={() => setShowModal(true)}
       />
 
@@ -88,19 +161,20 @@ export default function ProductPage() {
             </div>
           </div>
         ) : (
-          // 🟣 Tambahkan wrapper scrollable di sini
-          <div >
+          <div className="overflow-x-auto">
             <ProductTable
-              products={products}
+              products={filtered}
               onEdit={(p: Product) => console.log("Edit", p)}
               onDelete={(id: string) => console.log("Delete", id)}
-              onUpdate={(id: string, data: Omit<Product, 'id'>) => console.log("Update", id, data)}
+              onUpdate={(id: string, data: Omit<Product, "id">) =>
+                console.log("Update", id, data)
+              }
             />
           </div>
         )}
       </div>
 
-      {/* === Pagination === */}
+      {/* === Pagination Control === */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 text-sm text-gray-600 border-t pt-4">
         <p className="text-gray-500">
           <span className="font-medium text-gray-700">1–{pageSize}</span> of{" "}
@@ -132,7 +206,7 @@ export default function ProductPage() {
             onChange={(e) => setPageSize(Number(e.target.value))}
             className="border border-gray-300 rounded-lg text-sm px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-300"
           >
-            {[10, 20, 100].map((n) => (
+            {[10, 20, 50, 100].map((n) => (
               <option key={n} value={n}>
                 {n}
               </option>
