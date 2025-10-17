@@ -52,7 +52,7 @@ export default function ProductTableToolbar({
         </Button>
         <Button
           onClick={onNewProductClick}
-          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white shadow-md"
+          className="flex items-center gap-2  text-white shadow-md"
         >
           <Plus className="w-4 h-4" /> New Product
         </Button>

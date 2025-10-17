@@ -17,15 +17,22 @@ export async function GET(request: Request) {
   const pageSize = Number(searchParams.get("pageSize")) || 10;
   const offset = searchParams.get("offset") || "";
   const search = searchParams.get("search") || "";
+  const kategori = searchParams.get("kategori") || "";
+  const exportData = searchParams.get("export") === "true";
 
-  // Optional filtering by Nama_Produk
-  const filterFormula = search
-    ? `FIND(LOWER("${search}"), LOWER({Nama_Produk}))`
-    : "";
+  let filterFormula = "";
+  if (search) {
+    // Search by ID or Nama_Produk
+    filterFormula = `OR(FIND(LOWER("${search}"), LOWER({Nama_Produk})), FIND("${search}", RECORD_ID()))`;
+  }
+  if (kategori) {
+    const kategoriFilter = `{Kategori}="${kategori}"`;
+    filterFormula = filterFormula ? `AND(${filterFormula}, ${kategoriFilter})` : kategoriFilter;
+  }
 
   const queryParams = new URLSearchParams({
-    ...(pageSize ? { pageSize: String(pageSize) } : {}),
-    ...(offset ? { offset } : {}),
+    ...(pageSize && !exportData ? { pageSize: String(pageSize) } : {}),
+    ...(offset && !exportData ? { offset } : {}),
     ...(filterFormula ? { filterByFormula: filterFormula } : {}),
   });
 
@@ -59,6 +66,22 @@ export async function GET(request: Request) {
       persenLabaDus: Number(r.fields.Persen_Laba_Dus) || 0,
     })
   );
+
+  if (exportData) {
+    // Generate CSV
+    const csvHeaders = "ID,Nama Produk,Harga Beli SM,Harga Beli Sales,Harga Jual Ecer,Harga Jual Dus,Kategori,Isi,Persen Laba Ecer,Persen Laba Dus\n";
+    const csvRows = mappedRecords.map(r =>
+      `${r.id},"${r.namaProduk}",${r.hargaBeliSm},${r.hargaBeliSales},${r.hargaJualEcer},${r.hargaJualDus},"${r.kategori}",${r.isi},${r.persenLabaEcer},${r.persenLabaDus}`
+    ).join("\n");
+    const csv = csvHeaders + csvRows;
+
+    return new Response(csv, {
+      headers: {
+        "Content-Type": "text/csv",
+        "Content-Disposition": "attachment; filename=products.csv",
+      },
+    });
+  }
 
   return NextResponse.json({
     records: mappedRecords,
