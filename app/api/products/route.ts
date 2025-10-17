@@ -1,5 +1,37 @@
 import { NextResponse } from "next/server";
 
+// === Type Definitions ===
+type AirtableFields = {
+  Nama_Produk?: string;
+  Harga_Beli_Sales?: number;
+  Harga_Beli_SM?: number;
+  Harga_Jual_Ecer?: number;
+  Harga_Jual_Dus?: number;
+  Kategori?: string;
+  Isi?: number;
+  Persen_Laba_Ecer?: number;
+  Laba_Dus?: number;
+};
+
+type AirtableRecord = {
+  id: string;
+  fields: AirtableFields;
+};
+
+type ProductRecord = {
+  id: string;
+  namaProduk: string;
+  hargaBeliSm: number;
+  hargaBeliSales: number;
+  hargaJualEcer: number;
+  hargaJualDus: number;
+  kategori: string;
+  isi: number;
+  persenLabaEcer: number;
+  LabaDus: number;
+};
+
+// === Airtable Setup ===
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY!;
 const BASE_ID = process.env.AIRTABLE_BASE_ID!;
 const TABLE_NAME = process.env.AIRTABLE_TABLE_NAME!;
@@ -10,8 +42,8 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-// Fungsi bantu untuk hitung total record (loop semua halaman Airtable)
-async function getAllRecordsCount(filterFormula?: string) {
+// === Fungsi bantu hitung total record (loop semua halaman Airtable) ===
+async function getAllRecordsCount(filterFormula?: string): Promise<number> {
   let count = 0;
   let offset = "";
 
@@ -69,28 +101,28 @@ export async function GET(request: Request) {
 
   const data = await res.json();
 
-  const mappedRecords = data.records.map(
-    (r: { id: string; fields: Record<string, string | number | null | undefined> }) => ({
-      id: r.id,
-      namaProduk: r.fields.Nama_Produk || "",
-      hargaBeliSales: Number(r.fields.Harga_Beli_Sales) || 0,
-      hargaBeliSm: Number(r.fields.Harga_Beli_SM) || 0,
-      hargaJualEcer: Number(r.fields.Harga_Jual_Ecer) || 0,
-      hargaJualDus: Number(r.fields.Harga_Jual_Dus) || 0,
-      kategori: r.fields.Kategori || "",
-      isi: Number(r.fields.Isi) || 0,
-      persenLabaEcer: Number(r.fields.Persen_Laba_Ecer) || 0,
-      persenLabaDus: Number(r.fields.Persen_Laba_Dus) || 0,
-    })
-  );
+  // === Mapping Data ===
+  const mappedRecords: ProductRecord[] = (data.records as AirtableRecord[]).map((r) => ({
+    id: r.id,
+    namaProduk: r.fields.Nama_Produk || "",
+    hargaBeliSales: Number(r.fields.Harga_Beli_Sales) || 0,
+    hargaBeliSm: Number(r.fields.Harga_Beli_SM) || 0,
+    hargaJualEcer: Number(r.fields.Harga_Jual_Ecer) || 0,
+    hargaJualDus: Number(r.fields.Harga_Jual_Dus) || 0,
+    kategori: r.fields.Kategori || "",
+    isi: Number(r.fields.Isi) || 0,
+    persenLabaEcer: Number(r.fields.Persen_Laba_Ecer) || 0,
+    LabaDus: Number(r.fields.Laba_Dus) || 0,
+  }));
 
+  // === Export ke CSV ===
   if (exportData) {
     const csvHeaders =
       "ID,Nama Produk,Harga Beli SM,Harga Beli Sales,Harga Jual Ecer,Harga Jual Dus,Kategori,Isi,Persen Laba Ecer,Persen Laba Dus\n";
     const csvRows = mappedRecords
       .map(
         (r) =>
-          `${r.id},"${r.namaProduk}",${r.hargaBeliSm},${r.hargaBeliSales},${r.hargaJualEcer},${r.hargaJualDus},"${r.kategori}",${r.isi},${r.persenLabaEcer},${r.persenLabaDus}`
+          `${r.id},"${r.namaProduk}",${r.hargaBeliSm},${r.hargaBeliSales},${r.hargaJualEcer},${r.hargaJualDus},"${r.kategori}",${r.isi},${r.persenLabaEcer},${r.LabaDus}`
       )
       .join("\n");
     const csv = csvHeaders + csvRows;
@@ -129,7 +161,7 @@ export async function POST(request: Request) {
             Kategori: product.kategori,
             Isi: product.isi,
             Persen_Laba_Ecer: Number(product.persenLabaEcer),
-            Persen_Laba_Dus: Number(product.persenLabaDus),
+            Laba_Dus: Number(product.LabaDus),
           },
         },
       ],
@@ -172,7 +204,7 @@ export async function PATCH(request: Request) {
             Kategori: product.kategori,
             Isi: product.isi,
             Persen_Laba_Ecer: Number(product.persenLabaEcer),
-            Persen_Laba_Dus: Number(product.persenLabaDus),
+            Laba_Dus: Number(product.LabaDus),
           },
         },
       ],

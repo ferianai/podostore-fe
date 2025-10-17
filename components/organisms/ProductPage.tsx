@@ -24,7 +24,6 @@ interface Product {
 export default function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
-  const [offset, setOffset] = useState<string | null>(null);
   const [nextOffset, setNextOffset] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -48,7 +47,6 @@ export default function ProductPage() {
         const data = await res.json();
 
         setProducts(data.records);
-        setOffset(offsetValue || null);
         setNextOffset(data.offset || null);
         setTotalProducts(data.totalCount || 0);
         if (pageNum) setCurrentPage(pageNum);
