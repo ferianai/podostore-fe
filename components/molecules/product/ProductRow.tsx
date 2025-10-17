@@ -18,6 +18,7 @@ interface Product {
 
 interface ProductRowProps {
   product: Product;
+  index: number;
   onEdit: (p: Product) => void;
   onDelete: (id: string) => void;
   onUpdate: (id: string, product: Omit<Product, "id">) => void;
@@ -25,6 +26,7 @@ interface ProductRowProps {
 
 export default function ProductRow({
   product,
+  index,
   onEdit,
   onDelete,
   onUpdate,
@@ -61,10 +63,9 @@ export default function ProductRow({
     isSticky = false
   ) => {
     const value = currentProduct[field];
-    const baseClasses = `px-4 text-${align} cursor-pointer hover:bg-muted/40 whitespace-nowrap`;
-
+    const baseClasses = `px-4 py-2 text-${align} cursor-pointer hover:bg-muted/40 whitespace-nowrap`;
     const stickyClasses = isSticky
-      ? "sticky left-0 z-20 bg-white font-medium border-r border-border shadow-sm"
+      ? "sticky left-[3rem] z-20 bg-white font-medium border-r border-border shadow-sm"
       : "";
 
     if (editingField === field) {
@@ -103,10 +104,15 @@ export default function ProductRow({
   };
 
   return (
-    <tr
-      className="border-b hover:bg-muted/50 transition-colors"
-      onClick={(e) => e.stopPropagation()}
-    >
+    <tr className="border-b hover:bg-muted/50 transition-colors">
+      {/* Nomor urut global */}
+      <td
+        className="px-3 py-2 text-center sticky left-0 z-30 bg-white border-r border-gray-100 font-medium"
+        style={{ boxShadow: "2px 0 3px rgba(0,0,0,0.05)" }}
+      >
+        {index + 1}
+      </td>
+
       {renderCell("namaProduk", false, "left", true)}
       {renderCell("hargaBeliSm", true)}
       {renderCell("hargaBeliSales", true)}
@@ -116,6 +122,7 @@ export default function ProductRow({
       {renderCell("isi", false, "center")}
       {renderCell("persenLabaEcer", false, "center")}
       {renderCell("persenLabaDus", false, "center")}
+
       <td className="px-4 py-1 flex items-center gap-2 justify-end text-muted-foreground min-w-[100px]">
         {saving ? (
           <Loader2 size={16} className="animate-spin text-blue-500" />

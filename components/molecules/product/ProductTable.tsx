@@ -20,6 +20,8 @@ interface ProductTableProps {
   onEdit: (p: Product) => void;
   onDelete: (id: string) => void;
   onUpdate: (id: string, updatedProduct: Omit<Product, "id">) => void;
+  currentPage: number;
+  pageSize: number;
 }
 
 export default function ProductTable({
@@ -27,6 +29,8 @@ export default function ProductTable({
   onEdit,
   onDelete,
   onUpdate,
+  currentPage,
+  pageSize,
 }: ProductTableProps) {
   return (
     <div
@@ -34,11 +38,16 @@ export default function ProductTable({
       style={{ maxHeight: "700px" }}
     >
       <table className="min-w-[1200px] w-full border-collapse text-sm text-foreground">
-        {/* === Sticky Header === */}
         <thead className="bg-gray-100 text-gray-700 sticky top-0 z-30">
           <tr>
             <th
-              className="px-4 py-2 text-left whitespace-nowrap sticky left-0 z-40 bg-gray-100 border-r border-gray-200"
+              className="px-3 py-2 text-center sticky left-0 z-50 bg-gray-100 border-r border-gray-200 w-12"
+              style={{ boxShadow: "2px 0 3px rgba(0,0,0,0.05)" }}
+            >
+              No
+            </th>
+            <th
+              className="px-4 py-2 text-left whitespace-nowrap sticky left-[3rem] z-40 bg-gray-100 border-r border-gray-200"
               style={{ boxShadow: "2px 0 3px rgba(0,0,0,0.05)" }}
             >
               Nama Produk
@@ -55,13 +64,13 @@ export default function ProductTable({
           </tr>
         </thead>
 
-        {/* === Body === */}
         <tbody className="divide-y divide-gray-200 bg-white">
           {products.length > 0 ? (
-            products.map((product) => (
+            products.map((product, index) => (
               <ProductRow
                 key={product.id}
                 product={product}
+                index={(currentPage - 1) * pageSize + index}
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onUpdate={onUpdate}
@@ -70,7 +79,7 @@ export default function ProductTable({
           ) : (
             <tr>
               <td
-                colSpan={10}
+                colSpan={11}
                 className="px-4 py-6 text-center text-gray-500 italic"
               >
                 Tidak ada produk yang ditemukan.

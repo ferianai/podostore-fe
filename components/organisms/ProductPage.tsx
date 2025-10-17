@@ -23,10 +23,12 @@ interface Product {
 
 export default function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [offset, setOffset] = useState<string | null>(null);
   const [nextOffset, setNextOffset] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [search, setSearch] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<string>("asc");
@@ -35,7 +37,7 @@ export default function ProductPage() {
 
   // === Fetch Product Data ===
   const fetchProducts = useCallback(
-    async (offsetValue?: string) => {
+    async (offsetValue?: string, pageNum?: number) => {
       try {
         setLoading(true);
         const params = new URLSearchParams({ pageSize: String(pageSize) });
@@ -49,6 +51,7 @@ export default function ProductPage() {
         setFiltered(data.records);
         setOffset(offsetValue || null);
         setNextOffset(data.offset || null);
+        if (pageNum) setCurrentPage(pageNum);
       } catch (err) {
         console.error("Error fetching products:", err);
       } finally {
@@ -59,21 +62,19 @@ export default function ProductPage() {
   );
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(undefined, 1);
   }, [fetchProducts]);
 
-  // === Handle Filter & Sort ===
+  // === Filter, Search, Sort ===
   useEffect(() => {
     let result = [...products];
 
-    // Filter kategori
     if (category !== "all") {
       result = result.filter(
         (p) => p.kategori?.toLowerCase() === category.toLowerCase()
       );
     }
 
-    // Search
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -83,7 +84,6 @@ export default function ProductPage() {
       );
     }
 
-    // Sort
     result.sort((a, b) =>
       sortOrder === "asc"
         ? a.namaProduk.localeCompare(b.namaProduk)
@@ -93,7 +93,7 @@ export default function ProductPage() {
     setFiltered(result);
   }, [search, category, sortOrder, products]);
 
-  // === Handle Export ===
+  // === Export ===
   const handleExport = () => {
     const csv = [
       [
@@ -128,11 +128,18 @@ export default function ProductPage() {
 
   // === Pagination ===
   const handleNext = () => {
-    if (nextOffset) fetchProducts(nextOffset);
+    if (nextOffset) fetchProducts(nextOffset, currentPage + 1);
   };
   const handlePrev = () => {
-    fetchProducts();
+    if (currentPage > 1) fetchProducts(undefined, currentPage - 1);
   };
+
+  const sortedCategories = [
+    "all",
+    ...Array.from(new Set(products.map((p) => p.kategori))).sort((a, b) =>
+      a.localeCompare(b)
+    ),
+  ];
 
   return (
     <div className="space-y-6 w-full max-w-[1600px] mx-auto px-4">
@@ -141,7 +148,7 @@ export default function ProductPage() {
         search={search}
         category={category}
         sortOrder={sortOrder}
-        categories={[...new Set(products.map((p) => p.kategori))]} // 🔹 ambil kategori unik
+        categories={sortedCategories}
         onSearchChange={setSearch}
         onCategoryChange={setCategory}
         onSortChange={setSortOrder}
@@ -149,7 +156,7 @@ export default function ProductPage() {
         onNewProductClick={() => setShowModal(true)}
       />
 
-      {/* === Product Table === */}
+      {/* === Table === */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="p-6 space-y-2">
@@ -161,24 +168,29 @@ export default function ProductPage() {
             </div>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <ProductTable
-              products={filtered}
-              onEdit={(p: Product) => console.log("Edit", p)}
-              onDelete={(id: string) => console.log("Delete", id)}
-              onUpdate={(id: string, data: Omit<Product, "id">) =>
-                console.log("Update", id, data)
-              }
-            />
-          </div>
+          <ProductTable
+            products={filtered}
+            onEdit={(p: Product) => console.log("Edit", p)}
+            onDelete={(id: string) => console.log("Delete", id)}
+            onUpdate={(id: string, data: Omit<Product, "id">) =>
+              console.log("Update", id, data)
+            }
+            currentPage={currentPage}
+            pageSize={pageSize}
+          />
         )}
       </div>
 
       {/* === Pagination Control === */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 text-sm text-gray-600 border-t pt-4">
-        <p className="text-gray-500">
-          <span className="font-medium text-gray-700">1–{pageSize}</span> of{" "}
-          <span className="text-gray-700">13 Pages</span>
+        <p className="text-gray-600">
+          <span className="font-medium text-gray-800">
+            Halaman {currentPage}
+          </span>{" "}
+          dari{" "}
+          <span className="font-medium text-gray-800">
+            {Math.ceil(filtered.length / pageSize) || 1}
+          </span>
         </p>
 
         <div className="flex items-center gap-2">
@@ -186,17 +198,16 @@ export default function ProductPage() {
             variant="outline"
             size="sm"
             onClick={handlePrev}
-            disabled={!offset || loading}
-            className="border-gray-300 text-gray-600 hover:bg-gray-100"
+            disabled={currentPage <= 1 || loading}
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
+
           <Button
             variant="outline"
             size="sm"
             onClick={handleNext}
             disabled={!nextOffset || loading}
-            className="border-gray-300 text-gray-600 hover:bg-gray-100"
           >
             <ChevronRight className="w-4 h-4" />
           </Button>
@@ -204,7 +215,7 @@ export default function ProductPage() {
           <select
             value={pageSize}
             onChange={(e) => setPageSize(Number(e.target.value))}
-            className="border border-gray-300 rounded-lg text-sm px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-300"
+            className="border border-gray-300 rounded-lg text-sm px-2 py-1"
           >
             {[10, 20, 50, 100].map((n) => (
               <option key={n} value={n}>
@@ -219,7 +230,7 @@ export default function ProductPage() {
       {showModal && (
         <ProductFormModal
           onClose={() => setShowModal(false)}
-          onSubmit={() => fetchProducts()}
+          onSubmit={() => fetchProducts(undefined, currentPage)}
         />
       )}
     </div>
