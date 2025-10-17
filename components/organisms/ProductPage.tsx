@@ -132,7 +132,7 @@ export default function ProductPage() {
             onChange={(e) => setPageSize(Number(e.target.value))}
             className="border border-gray-300 rounded-lg text-sm px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-300"
           >
-            {[100, 200, 500].map((n) => (
+            {[10, 20, 100].map((n) => (
               <option key={n} value={n}>
                 {n}
               </option>
