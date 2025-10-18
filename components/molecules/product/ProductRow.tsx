@@ -107,7 +107,7 @@ export default function ProductRow({
   return (
     <tr className="border-b hover:bg-muted/50 transition-colors">
       {/* Nomor urut global */}
-      <td className="px-2 py-1 text-center sticky left-0 z-[10] bg-white border-r border-border shadow-sm w-12">
+      <td className="py-1 text-center sticky left-0 bg-white border-r border-border shadow-sm">
         {index + 1}
       </td>
 

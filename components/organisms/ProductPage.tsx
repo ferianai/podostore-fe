@@ -1,3 +1,4 @@
+// components/organisms/ProductPage.tsx
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
