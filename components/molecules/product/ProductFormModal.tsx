@@ -178,13 +178,13 @@ export default function ProductFormModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-muted rounded-md hover:bg-muted/70"
+              className="px-2 py-2 bg-muted rounded-md hover:bg-muted/70"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="px-2 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
               {initialData ? "Update" : "Add"}
             </button>

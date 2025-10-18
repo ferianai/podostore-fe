@@ -19,7 +19,7 @@ export default function ProductSkeleton() {
           {rows.map((_, i) => (
             <tr key={i} className="border-b border-border">
               {Array.from({ length: 9 }).map((_, j) => (
-                <td key={j} className="px-4 py-1">
+                <td key={j} className="px-2 py-1">
                   <div className="h-2 w-full bg-muted-foreground/10 rounded animate-pulse"></div>
                 </td>
               ))}

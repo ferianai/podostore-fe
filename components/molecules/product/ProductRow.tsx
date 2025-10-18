@@ -64,7 +64,7 @@ export default function ProductRow({
     isSticky = false
   ) => {
     const value = currentProduct[field];
-    const baseClasses = `px-4 py-1 text-${align} cursor-pointer hover:bg-muted/40 whitespace-nowrap`;
+    const baseClasses = `px-2 py-1 text-${align} cursor-pointer hover:bg-muted/40 whitespace-nowrap`;
     const stickyClasses = isSticky
       ? "sticky left-[3rem] z-20 bg-white font-medium border-r border-border shadow-sm"
       : "";
@@ -99,7 +99,7 @@ export default function ProductRow({
           handleEditInline(field, value);
         }}
       >
-        {isCurrency ? `Rp ${Number(value).toLocaleString()}` : value}
+        {isCurrency ? `${Number(value).toLocaleString()}` : value}
       </td>
     );
   };
@@ -107,7 +107,7 @@ export default function ProductRow({
   return (
     <tr className="border-b hover:bg-muted/50 transition-colors">
       {/* Nomor urut global */}
-      <td className="px-4 py-1 text-center sticky left-0 z-[10] bg-white border-r border-border shadow-sm w-12">
+      <td className="px-2 py-1 text-center sticky left-0 z-[10] bg-white border-r border-border shadow-sm w-12">
         {index + 1}
       </td>
 
@@ -121,7 +121,7 @@ export default function ProductRow({
       {renderCell("persenLabaEcer", false, "center")}
       {renderCell("labaDus", false, "center")}
 
-      <td className="px-4 py-1 flex items-center gap-2 justify-end text-muted-foreground min-w-[100px]">
+      <td className="px-2 py-1 flex items-center gap-2 justify-end text-muted-foreground min-w-[100px]">
         {saving ? (
           <Loader2 size={16} className="animate-spin text-blue-500" />
         ) : (
