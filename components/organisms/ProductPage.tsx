@@ -85,6 +85,8 @@ export default function ProductPage() {
         onSortChange={setSortOrder}
         onExportClick={() => window.open("/api/products?export=true", "_blank")}
         onNewProductClick={() => setShowModal(true)}
+        onUpdateProductClick={() => setShowModal(true)}
+        onSettingClick={() => setShowModal(true)}
       />
 
       <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-hidden">
