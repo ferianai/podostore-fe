@@ -1,3 +1,4 @@
+// components/molecules/product/ProductTableToolbar.tsx
 "use client";
 
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,8 @@ interface ProductTableToolbarProps {
   onSortChange: (value: string) => void;
   onExportClick: () => void;
   onNewProductClick: () => void;
+  onUpdateProductClick: () => void;
+  onSettingClick: () => void;
 }
 
 export default function ProductTableToolbar({
@@ -26,6 +29,8 @@ export default function ProductTableToolbar({
   onSortChange,
   onExportClick,
   onNewProductClick,
+  onUpdateProductClick,
+  onSettingClick,
 }: ProductTableToolbarProps) {
   // 🔹 Ambil kategori unik, filter kosong/null, lalu urutkan alfabetis (A → Z)
   const sortedCategories = Array.from(
@@ -35,7 +40,7 @@ export default function ProductTableToolbar({
   return (
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-4 rounded-sm shadow-sm border border-gray-200">
       {/* === Left Section === */}
-      <div className="flex flex-wrap gap-2 items-center">
+      <div className="flex flex-wrap gap-1 items-center">
         {/* Search Input */}
         <div className="relative w-64">
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
@@ -74,19 +79,31 @@ export default function ProductTableToolbar({
       </div>
 
       {/* === Right Section (Actions) === */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1">
         <Button
           variant="outline"
           onClick={onExportClick}
-          className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100"
+          className="flex items-center gap-1 border-gray-300 text-gray-700 hover:bg-gray-100"
         >
           <Download className="w-4 h-4" /> Export
         </Button>
         <Button
           onClick={onNewProductClick}
-          className="flex items-center gap-2 text-white shadow-md"
+          className="flex items-center gap-1 text-white shadow-md"
         >
-          <Plus className="w-4 h-4" /> New Product
+          <Plus className="w-4 h-4" /> Add
+        </Button>
+        <Button
+          onClick={onUpdateProductClick}
+          className="flex items-center gap-1 text-white shadow-md"
+        >
+          Edit
+        </Button>
+        <Button
+          onClick={onSettingClick}
+          className="flex items-center gap-1 text-white shadow-md"
+        >
+          Setting
         </Button>
       </div>
     </div>
