@@ -2,7 +2,7 @@ import ProductPage from '../../components/organisms/ProductPage';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="min-h-screen">
         <ProductPage />
     </div>
   );
