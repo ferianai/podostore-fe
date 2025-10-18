@@ -8,12 +8,12 @@ export default function Header() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   return (
-    <header className="bg-[#1b0341] text-white shadow-md sticky top-0 z-50">
+    <header className="bg-[#191258] text-white shadow-md sticky top-0 z-50">
       <div className="flex items-center justify-between px-4 py-2 sm:py-3 overflow-hidden">
         {/* Logo */}
         <div className="flex items-center">
-          <span className="text-lg sm:text-xl font-bold">
-            xyz<span className="text-yellow-400">grosir</span>
+          <span className="text-lg text-[#fbe80f] sm:text-xl font-bold">
+            xyz<span className="text-[#1ac2ff]">grosir</span>
           </span>
         </div>
 
