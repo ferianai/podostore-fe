@@ -9,7 +9,7 @@ interface ProductForm {
   kategori: string;
   isi: string;
   persen_laba_ecer: string;
-  persen_laba_dus: string;
+  laba_dus: string;
 }
 
 interface Product {
@@ -22,7 +22,7 @@ interface Product {
   kategori: string;
   isi: number;
   persenLabaEcer: number;
-  persenLabaDus: number;
+  LabaDus: number;
 }
 
 interface ProductFormModalProps {
@@ -43,7 +43,7 @@ export default function ProductFormModal({
     kategori: "",
     isi: "",
     persen_laba_ecer: "",
-    persen_laba_dus: ""
+    laba_dus: ""
   });
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function ProductFormModal({
         kategori: initialData.kategori || "",
         isi: String(initialData.isi || ""),
         persen_laba_ecer: String(initialData.persenLabaEcer || ""),
-        persen_laba_dus: String(initialData.persenLabaDus || ""),
+        laba_dus: String(initialData.LabaDus || ""),
       });
     } else {
       setForm({
@@ -65,7 +65,7 @@ export default function ProductFormModal({
         kategori: "",
         isi: "",
         persen_laba_ecer: "",
-        persen_laba_dus: "",
+        laba_dus: "",
       });
     }
   }, [initialData]);
@@ -166,8 +166,8 @@ export default function ProductFormModal({
             <label className="block text-sm font-medium">Laba Dus</label>
             <input
               type="text"
-              name="persen_laba_dus"
-              value={form.persen_laba_dus}
+              name="laba_dus"
+              value={form.laba_dus}
               onChange={handleChange}
               className="w-full border border-border rounded-md p-2 bg-background"
               required

@@ -28,7 +28,7 @@ type ProductRecord = {
   kategori: string;
   isi: number;
   persenLabaEcer: number;
-  LabaDus: number;
+  labaDus: number;
 };
 
 // === Airtable Setup ===
@@ -112,17 +112,17 @@ export async function GET(request: Request) {
     kategori: r.fields.Kategori || "",
     isi: Number(r.fields.Isi) || 0,
     persenLabaEcer: Number(r.fields.Persen_Laba_Ecer) || 0,
-    LabaDus: Number(r.fields.Laba_Dus) || 0,
+    labaDus: Number(r.fields.Laba_Dus) || 0,
   }));
 
   // === Export ke CSV ===
   if (exportData) {
     const csvHeaders =
-      "ID,Nama Produk,Harga Beli SM,Harga Beli Sales,Harga Jual Ecer,Harga Jual Dus,Kategori,Isi,Persen Laba Ecer,Persen Laba Dus\n";
+      "ID,Nama Produk,Harga Beli SM,Harga Beli Sales,Harga Jual Ecer,Harga Jual Dus,Kategori,Isi,Persen Laba Ecer,Laba Dus\n";
     const csvRows = mappedRecords
       .map(
         (r) =>
-          `${r.id},"${r.namaProduk}",${r.hargaBeliSm},${r.hargaBeliSales},${r.hargaJualEcer},${r.hargaJualDus},"${r.kategori}",${r.isi},${r.persenLabaEcer},${r.LabaDus}`
+          `${r.id},"${r.namaProduk}",${r.hargaBeliSm},${r.hargaBeliSales},${r.hargaJualEcer},${r.hargaJualDus},"${r.kategori}",${r.isi},${r.persenLabaEcer},${r.labaDus}`
       )
       .join("\n");
     const csv = csvHeaders + csvRows;
@@ -161,7 +161,7 @@ export async function POST(request: Request) {
             Kategori: product.kategori,
             Isi: product.isi,
             Persen_Laba_Ecer: Number(product.persenLabaEcer),
-            Laba_Dus: Number(product.LabaDus),
+            Laba_Dus: Number(product.labaDus),
           },
         },
       ],
@@ -204,7 +204,7 @@ export async function PATCH(request: Request) {
             Kategori: product.kategori,
             Isi: product.isi,
             Persen_Laba_Ecer: Number(product.persenLabaEcer),
-            Laba_Dus: Number(product.LabaDus),
+            Laba_Dus: Number(product.labaDus),
           },
         },
       ],

@@ -18,7 +18,7 @@ interface Product {
   kategori: string;
   isi: number;
   persenLabaEcer: number;
-  persenLabaDus: number;
+  labaDus: number;
 }
 
 export default function ProductPage() {

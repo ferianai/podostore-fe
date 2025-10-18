@@ -12,7 +12,7 @@ interface Product {
   kategori: string;
   isi: number;
   persenLabaEcer: number;
-  persenLabaDus: number;
+  labaDus: number;
 }
 
 export function useProductFilters(products: Product[]) {
@@ -68,7 +68,7 @@ export function useProductFilters(products: Product[]) {
       Kategori: p.kategori,
       Isi: p.isi,
       PersenLabaEcer: p.persenLabaEcer,
-      PersenLabaDus: p.persenLabaDus,
+      LabaDus: p.labaDus,
     }));
     exportToCsv(`product-export-${new Date().toISOString().slice(0, 10)}.csv`, toExport);
   };

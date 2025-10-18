@@ -1,3 +1,4 @@
+// ProductRow.tsx
 "use client";
 
 import { useState } from "react";
@@ -13,7 +14,7 @@ interface Product {
   kategori: string;
   isi: number;
   persenLabaEcer: number;
-  persenLabaDus: number;
+  labaDus: number;
 }
 
 interface ProductRowProps {
@@ -106,10 +107,7 @@ export default function ProductRow({
   return (
     <tr className="border-b hover:bg-muted/50 transition-colors">
       {/* Nomor urut global */}
-      <td
-        className="px-3 py-2 text-center sticky left-0 z-30 bg-white border-r border-gray-100 font-medium"
-        style={{ boxShadow: "2px 0 3px rgba(0,0,0,0.05)" }}
-      >
+      <td className="px-4 py-1 text-center sticky left-0 z-[10] bg-white border-r border-border shadow-sm w-12">
         {index + 1}
       </td>
 
@@ -121,7 +119,7 @@ export default function ProductRow({
       {renderCell("kategori")}
       {renderCell("isi", false, "center")}
       {renderCell("persenLabaEcer", false, "center")}
-      {renderCell("persenLabaDus", false, "center")}
+      {renderCell("labaDus", false, "center")}
 
       <td className="px-4 py-1 flex items-center gap-2 justify-end text-muted-foreground min-w-[100px]">
         {saving ? (
