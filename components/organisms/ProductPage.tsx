@@ -73,7 +73,7 @@ export default function ProductPage() {
   const totalPages = Math.ceil(totalProducts / pageSize) || 1;
 
   return (
-    <div className="space-y-6 w-full max-w-[1600px] mx-auto px-4">
+    <div className="space-y-6 w-full max-w-[1600px] mx-auto">
       <ProductTableToolbar
         search={search}
         category={category}

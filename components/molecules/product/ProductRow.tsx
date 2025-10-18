@@ -111,7 +111,7 @@ export default function ProductRow({
         {index + 1}
       </td>
 
-      {renderCell("namaProduk", false, "left", true)}
+      {renderCell("namaProduk", false, "left", false)}
       {renderCell("hargaBeliSm", true)}
       {renderCell("hargaBeliSales", true)}
       {renderCell("hargaJualEcer", true)}

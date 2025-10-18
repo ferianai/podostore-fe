@@ -47,12 +47,13 @@ export default function ProductTable({
             >
               No
             </th>
-            <th
+            {/* <th
               className="px-4 py-2 text-left whitespace-nowrap sticky left-[60px] z-[55] bg-gray-100 border-r border-gray-200 min-w-[180px]"
               style={{ boxShadow: "2px 0 3px rgba(0,0,0,0.05)" }}
             >
               Nama Produk
-            </th>
+            </th> */}
+            <th className="px-4 py-2">Nama Produk</th>
             <th className="px-4 py-2">Harga Beli SM</th>
             <th className="px-4 py-2">Harga Beli Sales</th>
             <th className="px-4 py-2">Harga Jual Ecer</th>
