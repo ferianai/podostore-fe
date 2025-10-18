@@ -33,7 +33,7 @@ export default function ProductTableToolbar({
   ).sort((a, b) => a.localeCompare(b));
 
   return (
-    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-4 rounded-sm shadow-sm border border-gray-200">
       {/* === Left Section === */}
       <div className="flex flex-wrap gap-2 items-center">
         {/* Search Input */}

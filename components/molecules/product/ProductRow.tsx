@@ -64,7 +64,7 @@ export default function ProductRow({
     isSticky = false
   ) => {
     const value = currentProduct[field];
-    const baseClasses = `px-4 py-2 text-${align} cursor-pointer hover:bg-muted/40 whitespace-nowrap`;
+    const baseClasses = `px-4 py-1 text-${align} cursor-pointer hover:bg-muted/40 whitespace-nowrap`;
     const stickyClasses = isSticky
       ? "sticky left-[3rem] z-20 bg-white font-medium border-r border-border shadow-sm"
       : "";

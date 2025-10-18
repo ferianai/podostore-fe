@@ -38,7 +38,7 @@ export default function ProductTable({
       className="relative w-full overflow-auto rounded-lg scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
       style={{ maxHeight: "700px" }}
     >
-      <table className="min-w-[1200px] w-full border-collapse text-sm text-foreground">
+      <table className="min-w-[1200px] w-full border-collapse text-xs text-foreground">
         <thead className="bg-gray-100 text-gray-700 sticky top-0 z-30">
           <tr>
             <th

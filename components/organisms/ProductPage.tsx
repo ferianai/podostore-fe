@@ -86,7 +86,7 @@ export default function ProductPage() {
         onNewProductClick={() => setShowModal(true)}
       />
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="p-6 space-y-2">
             {[...Array(5)].map((_, i) => (
