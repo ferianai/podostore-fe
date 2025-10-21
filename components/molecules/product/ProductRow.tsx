@@ -62,7 +62,8 @@ export default function ProductRow({
     field: keyof Product,
     isCurrency = false,
     align: "left" | "center" | "right" = "left",
-    isSticky = false
+    isSticky = false,
+    editable = true
   ) => {
     const value = currentProduct[field];
     const baseClasses = `px-2 py-1 text-${align} cursor-pointer hover:bg-muted/40 whitespace-nowrap`;
@@ -97,6 +98,7 @@ export default function ProductRow({
         className={`${baseClasses} ${stickyClasses}`}
         onClick={(e) => {
           e.stopPropagation();
+          if (!editable) return;
           handleEditInline(field, value);
         }}
       >
@@ -112,7 +114,7 @@ export default function ProductRow({
         {index + 1}
       </td>
 
-      {renderCell("namaProduk", false, "left", false)}
+      {renderCell("namaProduk", false, "left", false, false)}
       {renderCell("hargaBeliSm", true, "right")}
       {renderCell("hargaBeliPcs", true , "right")}
       {renderCell("isi", false, "right")}
