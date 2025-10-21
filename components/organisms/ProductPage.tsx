@@ -18,6 +18,7 @@ interface Product {
   hargaJualDus: number;
   kategori: string;
   isi: number;
+  hargaBeliPcs: number;
   persenLabaEcer: number;
   labaDus: number;
 }

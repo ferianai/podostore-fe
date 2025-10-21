@@ -13,6 +13,7 @@ interface Product {
   hargaJualDus: number;
   kategori: string;
   isi: number;
+  hargaBeliPcs: number;
   persenLabaEcer: number;
   labaDus: number;
 }
@@ -112,14 +113,15 @@ export default function ProductRow({
       </td>
 
       {renderCell("namaProduk", false, "left", false)}
-      {renderCell("hargaBeliSm", true)}
-      {renderCell("hargaBeliSales", true)}
-      {renderCell("hargaJualEcer", true)}
-      {renderCell("hargaJualDus", true)}
+      {renderCell("hargaBeliSm", true, "right")}
+      {renderCell("hargaBeliPcs", true , "right")}
+      {renderCell("isi", false, "right")}
+      {renderCell("hargaJualEcer", true, "right")}
+      {renderCell("hargaJualDus", true , "right")}
+      {renderCell("hargaBeliSales", true , "right")}
+      {renderCell("persenLabaEcer", false, "right")}
+      {renderCell("labaDus", false, "right")}
       {renderCell("kategori")}
-      {renderCell("isi", false, "center")}
-      {renderCell("persenLabaEcer", false, "center")}
-      {renderCell("labaDus", false, "center")}
 
       <td className="px-2 py-1 flex items-center gap-2 justify-end text-muted-foreground min-w-[100px]">
         {saving ? (

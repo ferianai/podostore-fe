@@ -12,6 +12,7 @@ interface Product {
   hargaJualDus: number;
   kategori: string;
   isi: number;
+  hargaBeliPcs: number;
   persenLabaEcer: number;
   labaDus: number;
 }
@@ -54,14 +55,15 @@ export default function ProductTable({
               Nama Produk
             </th> */}
             <th className="px-2 py-2 text-left">Nama Produk</th>
-            <th className="px-2 py-2 text-left">Harga Beli SM</th>
-            <th className="px-2 py-2 text-left">Harga Beli Sales</th>
-            <th className="px-2 py-2 text-left">Harga Jual Ecer</th>
-            <th className="px-2 py-2 text-left">Harga Jual Dus</th>
-            <th className="px-2 py-2 text-left">Kategori</th>
+            <th className="px-2 py-2 text-left">Hrg SM</th>
+            <th className="px-2 py-2 text-left">Hrg Pcs</th>
             <th className="px-2 py-2 text-center">Isi</th>
-            <th className="px-2 py-2 text-center">Persen Laba Ecer</th>
+            <th className="px-2 py-2 text-left">Hrg Jual Ecer</th>
+            <th className="px-2 py-2 text-left">Hrg Jual Dus</th>
+            <th className="px-2 py-2 text-left">Hrg Beli Sales</th>
+            <th className="px-2 py-2 text-center">%Ecer</th>
             <th className="px-2 py-2 text-center">Laba Dus</th>
+            <th className="px-2 py-2 text-left">Kategori</th>
             <th className="px-2 py-2 text-right">Action</th>
           </tr>
         </thead>
@@ -81,7 +83,7 @@ export default function ProductTable({
           ) : (
             <tr>
               <td
-                colSpan={11}
+                colSpan={12}
                 className="px-2 py-6 text-center text-gray-500 italic"
               >
                 Tidak ada produk yang ditemukan.

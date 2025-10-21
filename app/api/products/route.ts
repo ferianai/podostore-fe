@@ -11,6 +11,7 @@ type AirtableFields = {
   Isi?: number;
   Persen_Laba_Ecer?: number;
   Laba_Dus?: number;
+  Harga_Beli_Pcs?: number;
 };
 
 type AirtableRecord = {
@@ -29,6 +30,7 @@ type ProductRecord = {
   isi: number;
   persenLabaEcer: number;
   labaDus: number;
+  hargaBeliPcs: number;
 };
 
 // === Airtable Setup ===
@@ -102,27 +104,33 @@ export async function GET(request: Request) {
   const data = await res.json();
 
   // === Mapping Data ===
-  const mappedRecords: ProductRecord[] = (data.records as AirtableRecord[]).map((r) => ({
-    id: r.id,
-    namaProduk: r.fields.Nama_Produk || "",
-    hargaBeliSales: Number(r.fields.Harga_Beli_Sales) || 0,
-    hargaBeliSm: Number(r.fields.Harga_Beli_SM) || 0,
-    hargaJualEcer: Number(r.fields.Harga_Jual_Ecer) || 0,
-    hargaJualDus: Number(r.fields.Harga_Jual_Dus) || 0,
-    kategori: r.fields.Kategori || "",
-    isi: Number(r.fields.Isi) || 0,
-    persenLabaEcer: Number(r.fields.Persen_Laba_Ecer) || 0,
-    labaDus: Number(r.fields.Laba_Dus) || 0,
-  }));
+  const mappedRecords: ProductRecord[] = (data.records as AirtableRecord[]).map((r) => {
+    const isi = Number(r.fields.Isi) || 0;
+    const hargaBeliSm = Number(r.fields.Harga_Beli_SM) || 0;
+    const hargaBeliPcs = isi > 0 ? parseFloat((hargaBeliSm / isi).toFixed(2)) : 0;
+    return {
+      id: r.id,
+      namaProduk: r.fields.Nama_Produk || "",
+      hargaBeliSales: Number(r.fields.Harga_Beli_Sales) || 0,
+      hargaBeliSm,
+      hargaJualEcer: Number(r.fields.Harga_Jual_Ecer) || 0,
+      hargaJualDus: Number(r.fields.Harga_Jual_Dus) || 0,
+      kategori: r.fields.Kategori || "",
+      isi,
+      persenLabaEcer: Number(r.fields.Persen_Laba_Ecer) || 0,
+      labaDus: Number(r.fields.Laba_Dus) || 0,
+      hargaBeliPcs,
+    };
+  });
 
   // === Export ke CSV ===
   if (exportData) {
     const csvHeaders =
-      "ID,Nama Produk,Harga Beli SM,Harga Beli Sales,Harga Jual Ecer,Harga Jual Dus,Kategori,Isi,Persen Laba Ecer,Laba Dus\n";
+      "ID,Nama Produk,Harga Beli SM,Harga Beli Sales,Harga Jual Ecer,Harga Jual Dus,Kategori,Isi,Harga Beli Pcs,Persen Laba Ecer,Laba Dus\n";
     const csvRows = mappedRecords
       .map(
         (r) =>
-          `${r.id},"${r.namaProduk}",${r.hargaBeliSm},${r.hargaBeliSales},${r.hargaJualEcer},${r.hargaJualDus},"${r.kategori}",${r.isi},${r.persenLabaEcer},${r.labaDus}`
+          `${r.id},"${r.namaProduk}",${r.hargaBeliSm},${r.hargaBeliSales},${r.hargaJualEcer},${r.hargaJualDus},"${r.kategori}",${r.isi},${r.hargaBeliPcs},${r.persenLabaEcer},${r.labaDus}`
       )
       .join("\n");
     const csv = csvHeaders + csvRows;

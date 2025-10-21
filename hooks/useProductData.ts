@@ -10,8 +10,9 @@ export interface Product {
   hargaJualDus: number;
   kategori: string;
   isi: number;
+  hargaBeliPcs: number;
   persenLabaEcer: number;
-  persenLabaDus: number;
+  labaDus: number;
 }
 
 interface AirtableRecord {
@@ -59,8 +60,9 @@ export function useProductData() {
     hargaJualEcer: Number(product.hargaJualEcer),
     hargaJualDus: Number(product.hargaJualDus),
     isi: Number(product.isi),
+    hargaBeliPcs: Number(product.hargaBeliPcs),
     persenLabaEcer: Number(product.persenLabaEcer),
-    persenLabaDus: Number(product.persenLabaDus),
+    labaDus: Number(product.labaDus),
   });
 
   const handleAddProduct = useCallback(async (product: Omit<Product, 'id'>) => {

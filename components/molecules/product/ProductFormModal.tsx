@@ -21,8 +21,9 @@ interface Product {
   hargaJualDus: number;
   kategori: string;
   isi: number;
+  hargaBeliPcs: number;
   persenLabaEcer: number;
-  LabaDus: number;
+  labaDus: number;
 }
 
 interface ProductFormModalProps {
@@ -55,7 +56,7 @@ export default function ProductFormModal({
         kategori: initialData.kategori || "",
         isi: String(initialData.isi || ""),
         persen_laba_ecer: String(initialData.persenLabaEcer || ""),
-        laba_dus: String(initialData.LabaDus || ""),
+        laba_dus: String(initialData.labaDus || ""),
       });
     } else {
       setForm({
