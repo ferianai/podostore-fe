@@ -2,6 +2,7 @@
 "use client";
 
 import ProductRow from "./ProductRow";
+import { useProductFilter } from "@/components/context/ProductFilterContext";
 
 interface Product {
   id: string;
@@ -34,6 +35,15 @@ export default function ProductTable({
   currentPage,
   pageSize,
 }: ProductTableProps) {
+  const { sortOrder } = useProductFilter();
+
+  // ✅ Sorting dilakukan sebelum mapping
+  const sortedProducts = [...products].sort((a, b) =>
+    sortOrder === "asc"
+      ? a.namaProduk.localeCompare(b.namaProduk)
+      : b.namaProduk.localeCompare(a.namaProduk)
+  );
+
   return (
     <div
       className="relative w-full overflow-auto rounded-lg scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
@@ -69,8 +79,8 @@ export default function ProductTable({
         </thead>
 
         <tbody className="divide-y divide-gray-200 bg-white">
-          {products.length > 0 ? (
-            products.map((product, index) => (
+          {sortedProducts.length > 0 ? (
+            sortedProducts.map((product, index) => (
               <ProductRow
                 key={product.id}
                 product={product}

@@ -1,5 +1,6 @@
 // hooks/useProductData.ts
 import { useState, useEffect, useCallback } from 'react';
+import { useProductFilter } from "@/components/context/ProductFilterContext";
 
 export interface Product {
   id: string;
@@ -22,9 +23,12 @@ interface AirtableRecord {
 
 interface AirtableResponse {
   records: AirtableRecord[];
+  offset?: string | null;
+  totalCount?: number;
 }
 
 export function useProductData() {
+  const { category, sortOrder, search } = useProductFilter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +37,12 @@ export function useProductData() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/products');
+      const params = new URLSearchParams();
+      if (category && category !== "all") params.set("kategori", category);
+      if (sortOrder) params.set("sortOrder", sortOrder);
+      if (search) params.set("search", search);
+
+      const res = await fetch(`/api/products?${params.toString()}`);
       if (!res.ok) throw new Error('Failed to fetch products');
 
       const data: AirtableResponse = await res.json();
@@ -47,7 +56,7 @@ export function useProductData() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [category, sortOrder, search]);
 
   useEffect(() => {
     loadData();

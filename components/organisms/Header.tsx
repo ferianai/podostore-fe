@@ -1,11 +1,13 @@
 "use client";
 
 import { Search } from "lucide-react";
-import HamburgerMenuDrawer from "./HamburgerMenuDrawer";
 import { useState } from "react";
+import HamburgerMenuDrawer from "./HamburgerMenuDrawer";
+import { useProductFilter } from "@/components/context/ProductFilterContext";
 
 export default function Header() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const { search, setSearch } = useProductFilter();
 
   return (
     <header className="bg-[#191258] text-white shadow-md sticky top-0 z-50">
@@ -22,6 +24,8 @@ export default function Header() {
           <input
             type="text"
             placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-8 pr-2 py-2 rounded-full bg-white shadow-sm text-sm sm:text-base text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#606911] transition"
           />
           <Search
@@ -32,7 +36,6 @@ export default function Header() {
 
         {/* Mobile Icons */}
         <div className="flex items-center gap-2 sm:hidden">
-          {/* Search Icon toggles search input */}
           <button
             aria-label="Search"
             className="p-1.5 rounded-md hover:bg-purple-700 transition"
@@ -40,19 +43,19 @@ export default function Header() {
           >
             <Search size={20} />
           </button>
-
-          {/* Hamburger Drawer */}
           <HamburgerMenuDrawer />
         </div>
       </div>
 
-      {/* Mobile Search Input (overlay below header) */}
+      {/* Mobile Search Input */}
       {mobileSearchOpen && (
         <div className="sm:hidden px-4 pb-2">
           <div className="relative">
             <input
               type="text"
               placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-8 pr-2 py-2 rounded-full bg-white shadow-sm text-base text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#606911] transition"
               autoFocus
             />

@@ -36,7 +36,7 @@ type ProductRecord = {
 // === Airtable Setup ===
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY!;
 const BASE_ID = process.env.AIRTABLE_BASE_ID!;
-const TABLE_NAME = process.env.AIRTABLE_TABLE_NAME!;
+const TABLE_NAME = process.env.AIRTABLE_TABLE_NAME_PRODUCT!;
 const BASE_URL = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}`;
 
 const headers = {
@@ -64,31 +64,67 @@ async function getAllRecordsCount(filterFormula?: string): Promise<number> {
   return count;
 }
 
-// === GET ===
+// === FUNCTION: GET Unique Categories from Database (All) ===
+async function getAllCategories(): Promise<string[]> {
+  const categories: string[] = [];
+  let offset = "";
+
+  do {
+    const url = new URL(BASE_URL);
+    if (offset) url.searchParams.set("offset", offset);
+
+    const res = await fetch(url.toString(), { headers, cache: "no-store" });
+    if (!res.ok) break;
+
+    const data = await res.json();
+    data.records.forEach((record: AirtableRecord) => {
+      const kategori = record.fields.Kategori;
+      if (kategori && !categories.includes(kategori)) {
+        categories.push(kategori);
+      }
+    });
+
+    offset = data.offset || "";
+  } while (offset);
+
+  return categories.sort((a, b) => a.localeCompare(b));
+}
+
+// === GET Handler ===
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const pageSize = Number(searchParams.get("pageSize")) || 10;
+  const pageSize = Number(searchParams.get("pageSize")) || 100;
   const offset = searchParams.get("offset") || "";
   const search = searchParams.get("search") || "";
   const kategori = searchParams.get("kategori") || "";
   const exportData = searchParams.get("export") === "true";
+  const mode = searchParams.get("mode");
+  const sortOrder = searchParams.get("sortOrder") || "asc";
 
-  // === Filter formula ===
+  // ✅ Jika mode category → return daftar kategori
+  if (mode === "category") {
+    const categories = await getAllCategories();
+    return NextResponse.json({ categories });
+  }
+
+  // === Filter Airtable ===
   let filterFormula = "";
   if (search) {
-    filterFormula = `OR(FIND(LOWER("${search}"), LOWER({Nama_Produk})), FIND("${search}", RECORD_ID()))`;
+    const safeSearch = search.replace(/"/g, '\\"'); // Hindari error kutip
+    filterFormula = `OR(FIND(LOWER("${safeSearch}"), LOWER({Nama_Produk})))`;
   }
   if (kategori) {
     const kategoriFilter = `{Kategori}="${kategori}"`;
-    filterFormula = filterFormula ? `AND(${filterFormula}, ${kategoriFilter})` : kategoriFilter;
+    filterFormula = filterFormula
+      ? `AND(${filterFormula}, ${kategoriFilter})`
+      : kategoriFilter;
   }
 
-  // === Fetch data halaman aktif ===
-  const queryParams = new URLSearchParams({
-    ...(pageSize && !exportData ? { pageSize: String(pageSize) } : {}),
-    ...(offset && !exportData ? { offset } : {}),
-    ...(filterFormula ? { filterByFormula: filterFormula } : {}),
-  });
+  // === Build Query Params ===
+  const queryParams = new URLSearchParams();
+  if (pageSize && !exportData) queryParams.set("pageSize", String(pageSize));
+  if (offset && !exportData) queryParams.set("offset", offset);
+  if (filterFormula) queryParams.set("filterByFormula", filterFormula);
 
   const res = await fetch(`${BASE_URL}?${queryParams.toString()}`, {
     headers,
@@ -103,11 +139,13 @@ export async function GET(request: Request) {
 
   const data = await res.json();
 
-  // === Mapping Data ===
+  // === Format Data ===
   const mappedRecords: ProductRecord[] = (data.records as AirtableRecord[]).map((r) => {
     const isi = Number(r.fields.Isi) || 0;
     const hargaBeliSm = Number(r.fields.Harga_Beli_SM) || 0;
-    const hargaBeliPcs = isi > 0 ? parseFloat((hargaBeliSm / isi).toFixed(2)) : 0;
+    const hargaBeliPcs =
+      isi > 0 ? parseFloat((hargaBeliSm / isi).toFixed(2)) : 0;
+
     return {
       id: r.id,
       namaProduk: r.fields.Nama_Produk || "",
@@ -123,7 +161,7 @@ export async function GET(request: Request) {
     };
   });
 
-  // === Export ke CSV ===
+  // === Export CSV ===
   if (exportData) {
     const csvHeaders =
       "ID,Nama Produk,Harga Beli SM,Harga Beli Sales,Harga Jual Ecer,Harga Jual Dus,Kategori,Isi,Harga Beli Pcs,Persen Laba Ecer,Laba Dus\n";
@@ -143,7 +181,13 @@ export async function GET(request: Request) {
     });
   }
 
-  // === Hitung total record ===
+  // === Sort Products by namaProduk A-Z or Z-A ===
+  mappedRecords.sort((a, b) =>
+    sortOrder === "asc"
+      ? a.namaProduk.localeCompare(b.namaProduk)
+      : b.namaProduk.localeCompare(a.namaProduk)
+  );
+
   const totalCount = await getAllRecordsCount(filterFormula);
 
   return NextResponse.json({
