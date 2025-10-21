@@ -45,6 +45,10 @@ export default function ProductPage() {
         if (category !== "all") params.append("kategori", category);
 
         const res = await fetch(`/api/products?${params.toString()}`);
+        if (!res.ok) {
+          const text = await res.text(); // Optional: lihat error message dari server
+          throw new Error(`HTTP error ${res.status}: ${text}`);
+        }
         const data = await res.json();
 
         setProducts(data.records);
