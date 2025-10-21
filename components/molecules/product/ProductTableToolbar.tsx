@@ -23,7 +23,7 @@ export default function ProductTableToolbar() {
           onValueChange={(val) => setCategory(val)}
           disabled={loadingCategories}
         >
-          <SelectTrigger className="w-[150px] text-xs" size="sm">
+          <SelectTrigger className="w-[180px] text-xs" size="sm">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent side="bottom" align="start" className="text-xs max-h-120">
@@ -41,12 +41,12 @@ export default function ProductTableToolbar() {
           value={sortOrder}
           onValueChange={(val) => setSortOrder(val as SortOrder)}
         >
-          <SelectTrigger className="w-[80px] text-xs" size="sm">
+          <SelectTrigger className="w-[100px] text-xs" size="sm">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent side="bottom" align="start" className="w-[80px] text-xs">
-            <SelectItem value={SortOrder.ASC}>A → Z</SelectItem>
-            <SelectItem value={SortOrder.DESC}>Z → A</SelectItem>
+          <SelectContent side="bottom" align="start" className="text-xs max-h-80">
+            <SelectItem value={SortOrder.ASC} className="text-xs">A → Z</SelectItem>
+            <SelectItem value={SortOrder.DESC} className="text-xs">Z → A</SelectItem>
           </SelectContent>
         </Select>
       </div>
