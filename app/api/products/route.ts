@@ -1,3 +1,4 @@
+// app/api/products/route.ts
 import { NextResponse } from "next/server";
 
 // === Type Definitions ===
@@ -93,7 +94,8 @@ async function getAllCategories(): Promise<string[]> {
 // === GET Handler ===
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const pageSize = Number(searchParams.get("pageSize")) || 100;
+  const pageSizeRaw = Number(searchParams.get("pageSize")) || 100;
+  const pageSize = Math.min(Math.max(pageSizeRaw, 1), 100);
   const offset = searchParams.get("offset") || "";
   const search = searchParams.get("search") || "";
   const kategori = searchParams.get("kategori") || "";
@@ -110,9 +112,10 @@ export async function GET(request: Request) {
   // === Filter Airtable ===
   let filterFormula = "";
   if (search) {
-    const safeSearch = search.replace(/"/g, '\\"'); // Hindari error kutip
-    filterFormula = `OR(FIND(LOWER("${safeSearch}"), LOWER({Nama_Produk})))`;
+    const safeSearch = search.replace(/["']/g, "").trim();
+    filterFormula = `FIND(LOWER("${safeSearch}"), LOWER({Nama_Produk}))`;
   }
+
   if (kategori) {
     const kategoriFilter = `{Kategori}="${kategori}"`;
     filterFormula = filterFormula
@@ -125,6 +128,8 @@ export async function GET(request: Request) {
   if (pageSize && !exportData) queryParams.set("pageSize", String(pageSize));
   if (offset && !exportData) queryParams.set("offset", offset);
   if (filterFormula) queryParams.set("filterByFormula", filterFormula);
+
+  console.log("Querying Airtable with:", queryParams.toString());
 
   const res = await fetch(`${BASE_URL}?${queryParams.toString()}`, {
     headers,

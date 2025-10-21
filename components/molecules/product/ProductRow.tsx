@@ -67,7 +67,7 @@ export default function ProductRow({
     const value = currentProduct[field];
     const baseClasses = `px-2 py-1 text-${align} cursor-pointer hover:bg-muted/40 whitespace-nowrap`;
     const stickyClasses = isSticky
-      ? "sticky left-[3rem] z-20 bg-white font-medium border-r border-border shadow-sm"
+      ? "sticky left-[3rem] z-20 bg-white font-medium shadow-sm"
       : "";
 
     if (editingField === field) {
@@ -75,7 +75,7 @@ export default function ProductRow({
         <td className={`${baseClasses} ${stickyClasses}`}>
           <input
             type={typeof value === "number" ? "number" : "text"}
-            className="border rounded-md py-1 w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+            className="py-1 w-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
             value={tempValue}
             autoFocus
             onChange={(e) =>

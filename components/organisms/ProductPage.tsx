@@ -1,4 +1,4 @@
-// ProductPage.tsx
+// components/organisms/ProductPage.tsx
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -43,10 +43,14 @@ export default function ProductPage() {
         if (offsetValue) params.append("offset", offsetValue);
         if (search) params.append("search", search);
         if (category !== "all") params.append("kategori", category);
-        if (sortOrder) params.append("sort", sortOrder);
+        if (sortOrder) params.append("sortOrder", sortOrder);
 
         const res = await fetch(`/api/products?${params.toString()}`);
-        if (!res.ok) throw new Error("Failed to fetch data");
+        if (!res.ok) {
+          const errorBody = await res.text();
+          console.error("Fetch failed:", errorBody);
+          throw new Error("Failed to fetch data");
+        }
 
         const data = await res.json();
 
@@ -89,7 +93,7 @@ export default function ProductPage() {
     <div className="space-y-1 w-full max-w-[1600px] mx-auto">
       <ProductTableToolbar />
 
-      <div className="bg-white rounded-sm shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
         {loading && products.length === 0 ? (
           <div className="p-6 space-y-2">
             {[...Array(5)].map((_, i) => (
@@ -112,11 +116,35 @@ export default function ProductPage() {
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 text-sm text-gray-600 border-t pt-4">
+      <div className="flex sm:flex-row justify-between items-center gap-3 text-sm text-gray-600 border-t pt-1">
+
+        {/* Page Info */}
         <p>
-          <span className="font-medium">{currentPage}</span> dari{" "}
+          <span className="font-medium">{currentPage}</span>{" "}dari{" "}
           <span className="font-medium">{totalPages}</span>
         </p>
+
+        {/* Load More (Lazy Load) */}
+        {nextOffset && (
+          <div className="flex justify-center">
+            <Button
+              variant="outline"
+              onClick={() => fetchProducts(nextOffset, undefined, true)}
+              disabled={loading}
+              size="sm"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" /> Loading...
+                </>
+              ) : (
+                "Load More"
+              )}
+            </Button>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -139,7 +167,7 @@ export default function ProductPage() {
             onChange={(e) => setPageSize(Number(e.target.value))}
             className="border border-gray-300 rounded-lg text-sm px-2 py-1"
           >
-            {[100, 200, 500].map((n) => (
+            {[20, 50, 100].map((n) => (
               <option key={n} value={n}>
                 {n}
               </option>
@@ -148,23 +176,7 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* Load More (Lazy Load) */}
-      {nextOffset && (
-        <div className="flex justify-center mt-6">
-          <Button
-            onClick={() => fetchProducts(nextOffset, undefined, true)}
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Loading...
-              </>
-            ) : (
-              "Load More"
-            )}
-          </Button>
-        </div>
-      )}
+      
 
       {showModal && (
         <ProductFormModal

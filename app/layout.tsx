@@ -1,5 +1,4 @@
 import Header from "@/components/organisms/Header";
-import Footer from "@/components/organisms/Footer";
 import "./globals.css";
 import { ProductFilterProvider } from "@/components/context/ProductFilterContext";
 
@@ -10,7 +9,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ProductFilterProvider>
           <Header />
           <main className="max-w-7xl mx-auto px-4 py-4">{children}</main>
-          <Footer />
         </ProductFilterProvider>
       </body>
     </html>
