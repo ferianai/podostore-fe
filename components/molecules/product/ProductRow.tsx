@@ -1,8 +1,9 @@
-// ProductRow.tsx
 "use client";
 
 import { useState } from "react";
 import { Edit, Trash2, Loader2 } from "lucide-react";
+import { calculateHargaBeliPcs } from "@/lib/productCalculations"; 
+import { updateProduct } from "@/lib/products-api";
 
 interface Product {
   id: string;
@@ -23,7 +24,6 @@ interface ProductRowProps {
   index: number;
   onEdit: (p: Product) => void;
   onDelete: (id: string) => void;
-  onUpdate: (id: string, product: Omit<Product, "id">) => void;
 }
 
 export default function ProductRow({
@@ -31,7 +31,6 @@ export default function ProductRow({
   index,
   onEdit,
   onDelete,
-  onUpdate,
 }: ProductRowProps) {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<string | number>("");
@@ -45,10 +44,23 @@ export default function ProductRow({
 
   const handleSave = async (field: keyof Product) => {
     setSaving(true);
+
     const updated = { ...currentProduct, [field]: tempValue };
+
+    // 🔁 Perhitungan otomatis hargaBeliPcs
+    if (field === "hargaBeliSm" || field === "isi") {
+      const hargaBeliSm =
+        field === "hargaBeliSm" ? Number(tempValue) : currentProduct.hargaBeliSm;
+      const isi =
+        field === "isi" ? Number(tempValue) : currentProduct.isi;
+
+      const hargaBeliPcs = calculateHargaBeliPcs(hargaBeliSm, isi);
+      updated.hargaBeliPcs = hargaBeliPcs;
+    }
+
     try {
       const { id, ...productData } = updated;
-      await onUpdate(id, productData);
+      await updateProduct(id, productData);
       setCurrentProduct(updated);
     } catch (err) {
       console.error("Update failed:", err);
@@ -109,18 +121,18 @@ export default function ProductRow({
 
   return (
     <tr className="border-b hover:bg-muted/50 transition-colors">
-      {/* Nomor urut global */}
+      {/* Nomor urut */}
       <td className="py-1 text-center sticky left-0 bg-white border-r border-border shadow-sm">
         {index + 1}
       </td>
 
       {renderCell("namaProduk", false, "left", false, false)}
       {renderCell("hargaBeliSm", true, "right")}
-      {renderCell("hargaBeliPcs", true , "right", false, false)}
+      {renderCell("hargaBeliPcs", true, "right", false, false)}
       {renderCell("isi", false, "right")}
       {renderCell("hargaJualEcer", true, "right", false, false)}
-      {renderCell("hargaJualDus", true , "right", false, false)}
-      {renderCell("hargaBeliSales", true , "right", false, false)}
+      {renderCell("hargaJualDus", true, "right", false, false)}
+      {renderCell("hargaBeliSales", true, "right", false, false)}
       {renderCell("persenLabaEcer", false, "right")}
       {renderCell("labaDus", false, "right")}
       {renderCell("kategori")}

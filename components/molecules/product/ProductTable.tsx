@@ -3,26 +3,14 @@
 
 import ProductRow from "./ProductRow";
 import { useProductFilter } from "@/components/context/ProductFilterContext";
+import { Product, ProductInput } from "@/types/Product";
 
-interface Product {
-  id: string;
-  namaProduk: string;
-  hargaBeliSm: number;
-  hargaBeliSales: number;
-  hargaJualEcer: number;
-  hargaJualDus: number;
-  kategori: string;
-  isi: number;
-  hargaBeliPcs: number;
-  persenLabaEcer: number;
-  labaDus: number;
-}
 
 interface ProductTableProps {
   products: Product[];
   onEdit: (p: Product) => void;
   onDelete: (id: string) => void;
-  onUpdate: (id: string, updatedProduct: Omit<Product, "id">) => void;
+  onUpdate: (id: string, updatedProduct: ProductInput) => void;
   currentPage: number;
   pageSize: number;
 }
@@ -31,7 +19,6 @@ export default function ProductTable({
   products,
   onEdit,
   onDelete,
-  onUpdate,
   currentPage,
   pageSize,
 }: ProductTableProps) {
@@ -86,7 +73,6 @@ export default function ProductTable({
                 index={(currentPage - 1) * pageSize + index}
                 onEdit={onEdit}
                 onDelete={onDelete}
-                onUpdate={onUpdate}
               />
             ))
           ) : (
