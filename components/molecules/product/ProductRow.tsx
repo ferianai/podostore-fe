@@ -116,11 +116,11 @@ export default function ProductRow({
 
       {renderCell("namaProduk", false, "left", false, false)}
       {renderCell("hargaBeliSm", true, "right")}
-      {renderCell("hargaBeliPcs", true , "right")}
+      {renderCell("hargaBeliPcs", true , "right", false, false)}
       {renderCell("isi", false, "right")}
-      {renderCell("hargaJualEcer", true, "right")}
-      {renderCell("hargaJualDus", true , "right")}
-      {renderCell("hargaBeliSales", true , "right")}
+      {renderCell("hargaJualEcer", true, "right", false, false)}
+      {renderCell("hargaJualDus", true , "right", false, false)}
+      {renderCell("hargaBeliSales", true , "right", false, false)}
       {renderCell("persenLabaEcer", false, "right")}
       {renderCell("labaDus", false, "right")}
       {renderCell("kategori")}
