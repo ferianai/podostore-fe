@@ -7,7 +7,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="bg-gray-50 text-gray-900">
         <ProductFilterProvider>
-          <Header />
+          <Header/>
           <main className="max-w-7xl mx-auto px-4 py-4">{children}</main>
         </ProductFilterProvider>
       </body>

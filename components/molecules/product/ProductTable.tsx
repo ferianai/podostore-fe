@@ -52,7 +52,7 @@ export default function ProductTable({
         <thead className="bg-gray-100 text-gray-700 sticky top-0 z-30">
           <tr>
             <th
-              className="py-2 text-center whitespace-nowrap sticky left-0 z-[55] bg-gray-100 border-r border-gray-200 w-10"
+              className="py-2 text-center whitespace-nowrap sticky left-0 z-55 bg-gray-100 border-r border-gray-200 w-10"
               style={{ boxShadow: "2px 0 3px rgba(0,0,0,0.08)" }}
             >
               No

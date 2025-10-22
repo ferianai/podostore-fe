@@ -11,7 +11,7 @@ export default function Header() {
 
   return (
     <header className="bg-[#191258] text-white shadow-md sticky top-0 z-50">
-      <div className="flex items-center px-4 py-2 sm:py-3 w-full">
+      <div className="flex items-center px-4 py-2 sm:py-3 sm:w-full max-w-[1600px] mx-auto">
         
         {/* Logo */}
         <div className="flex shrink-0">
